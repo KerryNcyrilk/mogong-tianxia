@@ -1,6 +1,15 @@
+import catalog from "../../data/units.json" with { type: "json" }
 import { balance } from "./balance.ts"
 import { counterMultiplier } from "./counter.ts"
-import type { DamageInput, General } from "./types.ts"
+import type { DamageInput, General, UnitSnapshot } from "./types.ts"
+
+/** v4.0: floor((ATK * C - DEF) * M), then clamp at minDamage. */
+export function calcDamage(a: UnitSnapshot, d: UnitSnapshot, opts?: { morale?: number }): number {
+  const morale = opts?.morale ?? catalog.formula.defaultMorale
+  const advantage = counterMultiplier(a.id, d.id)
+  const raw = (a.atk * advantage - d.def) * morale
+  return Math.max(catalog.formula.minDamage, Math.floor(raw))
+}
 
 /** Spec §2.1 writes the aura divisor as /200. It is not a balance.json key. */
 const AURA_DIVISOR = 200
