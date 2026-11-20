@@ -1,13 +1,15 @@
+import { spdOf } from "./catalog.ts"
 import type { UnitType } from "./types.ts"
 
+/** Speeds come from data/units.json, which records the v3.1 §3 table. */
 export const SPEED: Record<UnitType, number> = {
-  cavalry: 7,
-  blade: 6,
-  beast: 6,
-  bow: 4,
-  scholar: 4,
-  halberd: 4,
-  shield: 3,
+  cavalry: spdOf("cavalry"),
+  blade: spdOf("blade"),
+  beast: spdOf("beast"),
+  bow: spdOf("bow"),
+  scholar: spdOf("scholar"),
+  halberd: spdOf("halberd"),
+  shield: spdOf("shield"),
 }
 
 /** Lower rank acts first when speed ties. This is the locked listing order. */
