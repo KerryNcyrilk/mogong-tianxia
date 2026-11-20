@@ -55,8 +55,8 @@ function wipeWinner(squads: readonly Squad[]): Side | "draw" | null {
   const defenderAlive = sideHp(squads, "defender") > 0
   if (attackerAlive && defenderAlive) return null
   if (attackerAlive) return "attacker"
-  if (defenderAlive) return "defender"
-  return "draw"
+  // One side wiped, or both wiped in the same turn: the defender holds.
+  return "defender"
 }
 
 function replaceSquad(squads: readonly Squad[], id: string, next: Squad): Squad[] {
@@ -168,13 +168,10 @@ function strike(
 }
 
 function finishByHp(state: BattleState): BattleState {
-  const attacker = sideHp(state.squads, "attacker")
-  const defender = sideHp(state.squads, "defender")
-  const winner = attacker > defender ? "attacker" : defender > attacker ? "defender" : "draw"
   return {
     ...state,
     phase: "done",
-    winner,
+    winner: "defender",
     reason: "turn-limit",
     log: [...state.log, { kind: "turn-limit", turn: state.turn }],
   }

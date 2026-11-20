@@ -1,4 +1,3 @@
-import catalog from "../../data/units.json" with { type: "json" }
 import type { General, Squad, UnitType } from "../combat/types.ts"
 
 interface CatalogRow {
@@ -9,7 +8,19 @@ interface CatalogRow {
   move: number
 }
 
-const units = catalog.units as Record<UnitType, CatalogRow>
+/**
+ * Sandbox roster numbers. These are the pre-v4 lineup the grid view already
+ * shipped with. The official table is data/units.json and is not read here.
+ */
+const SANDBOX_UNITS: Record<UnitType, CatalogRow> = {
+  cavalry: { atk: 14, def: 8, hpPer: 12, range: 1, move: 3 },
+  blade: { atk: 10, def: 8, hpPer: 10, range: 1, move: 2 },
+  beast: { atk: 16, def: 12, hpPer: 40, range: 1, move: 2 },
+  bow: { atk: 11, def: 6, hpPer: 8, range: 3, move: 2 },
+  scholar: { atk: 12, def: 5, hpPer: 7, range: 5, move: 2 },
+  halberd: { atk: 10, def: 9, hpPer: 12, range: 1, move: 2 },
+  shield: { atk: 6, def: 14, hpPer: 16, range: 1, move: 1 },
+}
 
 interface Draft {
   id: string
@@ -23,7 +34,7 @@ interface Draft {
 }
 
 function squad(draft: Draft): Squad {
-  const row = units[draft.type]
+  const row = SANDBOX_UNITS[draft.type]
   const hp = draft.count * row.hpPer
   return {
     id: draft.id,

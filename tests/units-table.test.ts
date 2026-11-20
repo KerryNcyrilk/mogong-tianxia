@@ -1,152 +1,121 @@
 import { describe, expect, test } from "vitest"
+import { balance } from "../src/combat/balance.ts"
 import { COMBAT_FIELDS } from "../src/combat/catalog.ts"
-import { COUNTER_PAIRS, COUNTER_TARGET, counterMultiplier } from "../src/combat/counter.ts"
-import { calculateDamage } from "../src/combat/damage.ts"
-import { SPEED } from "../src/combat/initiative.ts"
-import type { UnitType } from "../src/combat/types.ts"
+import { COUNTER_PAIRS, canonicalUnitId } from "../src/combat/counter.ts"
 import catalog from "../data/units.json" with { type: "json" }
-
-const RING = [
-  ["scholar", "bow"],
-  ["bow", "shield"],
-  ["shield", "blade"],
-  ["blade", "halberd"],
-  ["halberd", "cavalry"],
-  ["cavalry", "scholar"],
-] as const
 
 const IDENTITY = ["id", "name", "tier"] as const
 
-function edge(pair: { attacker: string; defender: string }): string {
-  return `${pair.attacker}->${pair.defender}`
-}
+const UNITS = [
+  ["dao", "刀兵", "base", 420, 260, 60, 1, 1000],
+  ["ji", "戟兵", "base", 380, 320, 55, 2, 1100],
+  ["gong", "弓兵", "base", 460, 180, 65, 4, 800],
+  ["dun", "盾兵", "base", 240, 480, 45, 1, 1400],
+  ["qi", "騎兵", "base", 520, 300, 90, 2, 1200],
+  ["xuezhe", "學者", "base", 500, 200, 70, 3, 700],
+  ["rui-dao", "銳刀", "elite", 630, 340, 60, 1, 1200],
+  ["chang-ji", "長戟衛", "elite", 570, 420, 55, 2, 1320],
+  ["qiang-nu", "強弩", "elite", 690, 235, 65, 5, 960],
+  ["tie-dun", "鐵盾", "elite", 360, 625, 45, 1, 1680],
+  ["zhong-qi", "重騎", "elite", 780, 390, 90, 2, 1440],
+] as const
 
-describe("units.json B1 table", () => {
-  test("holds 11 slots and 3 targets, with six combat fields on every row", () => {
-    const live = Object.values(catalog.units)
-    const slots = [...live, ...catalog.pendingUnits]
-    expect(live).toHaveLength(7)
-    expect(catalog.pendingUnits).toHaveLength(4)
-    expect(slots).toHaveLength(11)
-    expect(catalog.targets).toHaveLength(3)
-    for (const row of [...slots, ...catalog.targets]) {
-      for (const key of IDENTITY) expect(row).toHaveProperty(key)
-      for (const key of COMBAT_FIELDS) expect(row).toHaveProperty(key)
-      for (const key of COMBAT_FIELDS) expect(row.source).toHaveProperty(key)
+describe("v4.0 H data", () => {
+  test("H1 11 units are complete and the empty slots are gone", () => {
+    expect(catalog.units).toHaveLength(11)
+    expect(catalog.units.filter((row) => row.tier === "base")).toHaveLength(6)
+    expect(catalog.units.filter((row) => row.tier === "elite")).toHaveLength(5)
+    expect("pendingUnits" in catalog).toBe(false)
+    expect(JSON.stringify(catalog).includes("pending")).toBe(false)
+    expect(catalog.units.map((row) => row.name)).not.toContain("神獸")
+    expect(catalog.units.filter((row) => row.id === "xuezhe" || catalog.aliases[row.id as keyof typeof catalog.aliases] === "xuezhe")).toHaveLength(1)
+    const text = JSON.stringify(catalog)
+    for (const retired of ["cavalry", "blade", "beast", "bow", "scholar", "halberd", "shield"]) {
+      expect(text.includes(retired)).toBe(false)
     }
-  })
-
-  test("counter set is the six-edge ring, expanded to 12 directed pairs", () => {
-    expect(catalog.counter).toHaveLength(12)
-    const counters = catalog.counter.filter((pair) => pair.relation === "counters")
-    const countered = catalog.counter.filter((pair) => pair.relation === "countered-by")
-    expect(counters.map(edge).sort()).toEqual(RING.map((pair) => pair.join("->")).sort())
-    expect(countered.map(edge).sort()).toEqual(RING.map(([attacker, defender]) => `${defender}->${attacker}`).sort())
-    expect(new Set(catalog.counter.map(edge)).size).toBe(12)
-  })
-
-  test("every TARGET-* fixture has def 0 and tier test", () => {
-    expect(catalog.targets.map((row) => row.id)).toEqual(["TARGET-A1", "TARGET-A2", "TARGET-A5"])
-    for (const row of catalog.targets) {
-      expect(row.id.startsWith("TARGET-")).toBe(true)
-      expect(row.def).toBe(0)
-      expect(row.tier).toBe("test")
-      expect(row.source.def).toBe("fixture-def-0")
-    }
-  })
-
-  test("live speeds are the table values and pending combat numbers stay unset", () => {
-    for (const [id, row] of Object.entries(catalog.units)) {
-      expect(SPEED[id as UnitType]).toBe(row.spd)
-      expect(row.def).toBeGreaterThan(0)
-    }
-    for (const row of catalog.pendingUnits) {
+    expect(catalog.units.map((row) => [row.id, row.name, row.tier, row.atk, row.def, row.spd, row.range, row.hp])).toEqual(
+      UNITS.map((row) => [...row]),
+    )
+    for (const row of catalog.units) {
+      for (const key of IDENTITY) expect(row[key]).not.toEqual("")
       for (const key of COMBAT_FIELDS) {
-        expect(row[key]).toBeNull()
-        expect(row.source[key]).toBe("pending-14.7")
+        expect(typeof row[key]).toBe("number")
+        expect(Number.isFinite(row[key])).toBe(true)
       }
+      expect(row.def).toBeGreaterThan(0)
+      expect(row.hp).toBeGreaterThan(0)
     }
   })
-})
 
-describe("counter pairs from the table", () => {
-  test("all 12 directed pairs match the one-way multiplier", () => {
-    expect(COUNTER_PAIRS).toHaveLength(12)
-    const atk = 2
-    const count = 100
-    for (const pair of COUNTER_PAIRS) {
-      const expected = pair.relation === "counters" ? 1.3 : 1
-      expect(counterMultiplier(pair.attacker, pair.defender, false)).toBe(expected)
-      const damage = calculateDamage({
-        atk,
-        def: 0,
-        count,
-        attackerType: pair.attacker,
-        defenderType: pair.defender,
-        attackerGeneral: null,
-        defenderGeneral: null,
-        retaliation: false,
-      })
-      expect(damage).toBe(atk * count * expected)
+  test("H2 counter set is the twelve directed pairs", () => {
+    expect(catalog.counters).toHaveLength(12)
+    expect(COUNTER_PAIRS).toEqual(catalog.counters)
+    const advantage = catalog.counters.filter((pair) => pair.mult === balance.COUNTER_MULT)
+    const reverse = catalog.counters.filter((pair) => pair.mult === balance.COUNTER_WEAK)
+    expect(advantage).toHaveLength(6)
+    expect(reverse).toHaveLength(6)
+    expect(advantage.map((pair) => pair.mult)).toEqual([1.25, 1.25, 1.25, 1.25, 1.25, 1.25])
+    expect(reverse.map((pair) => pair.mult)).toEqual([0.8, 0.8, 0.8, 0.8, 0.8, 0.8])
+    expect(catalog.counters).toEqual([
+      { attacker: "xuezhe", defender: "gong", mult: 1.25 },
+      { attacker: "gong", defender: "dun", mult: 1.25 },
+      { attacker: "dun", defender: "dao", mult: 1.25 },
+      { attacker: "dao", defender: "ji", mult: 1.25 },
+      { attacker: "ji", defender: "qi", mult: 1.25 },
+      { attacker: "qi", defender: "xuezhe", mult: 1.25 },
+      { attacker: "gong", defender: "xuezhe", mult: 0.8 },
+      { attacker: "dun", defender: "gong", mult: 0.8 },
+      { attacker: "dao", defender: "dun", mult: 0.8 },
+      { attacker: "ji", defender: "dao", mult: 0.8 },
+      { attacker: "qi", defender: "ji", mult: 0.8 },
+      { attacker: "xuezhe", defender: "qi", mult: 0.8 },
+    ])
+    expect(new Set(catalog.counters.map((pair) => `${pair.attacker}->${pair.defender}`)).size).toBe(12)
+  })
+
+  test("H3 three targets have def 0 and A5 atk is 5832", () => {
+    expect(catalog.targets).toHaveLength(3)
+    expect(catalog.targets.map((row) => row.id)).toEqual(["TARGET-A1", "TARGET-A2", "TARGET-A5"])
+    for (const row of catalog.targets) expect(row.def).toBe(0)
+    expect(catalog.targets.map((row) => [row.id, row.atk, row.def, row.hp])).toEqual([
+      ["TARGET-A1", 1000, 0, 99999],
+      ["TARGET-A2", 1000, 0, 99999],
+      ["TARGET-A5", 5832, 0, 99999],
+    ])
+  })
+
+  test("H4 schema, formula, turn cap, and elite aliases are present", () => {
+    expect(catalog.schemaVersion).toBe("units.v4.0")
+    expect(catalog.formula).toEqual({
+      type: "linear-sub-def",
+      rounding: "floor",
+      minDamage: 0,
+      defaultMorale: 1,
+    })
+    expect(catalog.turnLimit).toBe(15)
+    expect(catalog.turnLimitResult).toBe("attacker-lose")
+    expect(catalog.aliases).toEqual({
+      "rui-dao": "dao",
+      "chang-ji": "ji",
+      "qiang-nu": "gong",
+      "tie-dun": "dun",
+      "zhong-qi": "qi",
+    })
+    expect(canonicalUnitId("rui-dao")).toBe("dao")
+    expect(canonicalUnitId("chang-ji")).toBe("ji")
+    expect(canonicalUnitId("qiang-nu")).toBe("gong")
+    expect(canonicalUnitId("tie-dun")).toBe("dun")
+    expect(canonicalUnitId("zhong-qi")).toBe("qi")
+    expect(canonicalUnitId("xuezhe")).toBe("xuezhe")
+    expect(canonicalUnitId("dao")).toBe("dao")
+    for (const row of catalog.units) {
+      for (const key of [...IDENTITY, ...COMBAT_FIELDS]) expect(row).toHaveProperty(key)
     }
-    expect(COUNTER_TARGET).toEqual({
-      scholar: "bow",
-      bow: "shield",
-      shield: "blade",
-      blade: "halberd",
-      halberd: "cavalry",
-      cavalry: "scholar",
-      beast: null,
-    })
-  })
-})
-
-describe("target def 0 damage", () => {
-  test("TARGET-A5 def 0 keeps the A5 anchor at 4374", () => {
-    const target = catalog.targets.find((row) => row.id === "TARGET-A5")
-    expect(target?.def).toBe(0)
-    const count = 1620
-    const atk = 2
-    const generalAtk = 70
-    const theoretical = atk * (1 + generalAtk / 200) * count - (target?.def ?? 1) * count
-    const damage = calculateDamage({
-      atk,
-      def: target?.def ?? 1,
-      count,
-      attackerType: "bow",
-      defenderType: "blade",
-      attackerGeneral: { id: "fixture-general", name: "夾具", atk: generalAtk, def: 40 },
-      defenderGeneral: null,
-      retaliation: false,
-    })
-    expect(theoretical).toBe(4374)
-    expect(damage).toBe(4374)
-    expect(damage).toBe(theoretical)
-  })
-
-  test("each zero-def target makes damage equal the def-0 theoretical value", () => {
-    const cases = [
-      { id: "TARGET-A1", atk: 2, count: 1620, attackerType: "bow" as const, defenderType: "blade" as const, generalAtk: 0, expected: 3240 },
-      { id: "TARGET-A2", atk: 10, count: 560, attackerType: "scholar" as const, defenderType: "shield" as const, generalAtk: 0, expected: 5600 },
-      { id: "TARGET-A5", atk: 2, count: 1620, attackerType: "bow" as const, defenderType: "blade" as const, generalAtk: 70, expected: 4374 },
-    ]
-    for (const item of cases) {
-      const target = catalog.targets.find((row) => row.id === item.id)
-      expect(target?.def).toBe(0)
-      const atkPrime = item.atk * (1 + item.generalAtk / 200)
-      const theoretical = atkPrime * item.count * 1 - (target?.def ?? 1) * item.count
-      const damage = calculateDamage({
-        atk: item.atk,
-        def: target?.def ?? 1,
-        count: item.count,
-        attackerType: item.attackerType,
-        defenderType: item.defenderType,
-        attackerGeneral: item.generalAtk === 0 ? null : { id: "fixture-general", name: "夾具", atk: item.generalAtk, def: 40 },
-        defenderGeneral: null,
-        retaliation: false,
-      })
-      expect(damage).toBe(item.expected)
-      expect(damage).toBe(theoretical)
+    for (const row of catalog.targets) {
+      expect(row).toHaveProperty("id")
+      expect(row).toHaveProperty("atk")
+      expect(row).toHaveProperty("def")
+      expect(row).toHaveProperty("hp")
     }
   })
 })

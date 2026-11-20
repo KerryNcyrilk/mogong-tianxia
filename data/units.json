@@ -1,289 +1,213 @@
 {
-  "note": "B1 結構表。combat-spec §14.7 原文不在本庫，所以攻、防、單位體力、非弓射程、移動沿用沙盒原值，並標 source pending-14.7；這些不是官方真表，也不覆蓋驗收夾具。速度取自 combat-spec.v3.1 §3。弓射程 3 取自同一節。相克鏈只採用 v3.1 ACCEPT 單向環：學者 → 弓 → 盾 → 刀 → 戟 → 騎 → 學者。ACCEPT 規格只鎖定 7 個兵種身份，其餘 4 席放在 pendingUnits，數值為 null，不寫進 units，以免把未知防禦混進「實戰防禦大於 0」的驗收。",
-  "units": {
-    "cavalry": {
-      "id": "cavalry",
-      "name": "騎",
-      "tier": "unspecified",
-      "atk": 14,
-      "def": 8,
-      "spd": 7,
-      "hpPer": 12,
+  "schemaVersion": "units.v4.0",
+  "source": "combat-spec.v4.0 §1（豆包重寫，唯一真表）",
+  "units": [
+    {
+      "id": "dao",
+      "name": "刀兵",
+      "tier": "base",
+      "atk": 420,
+      "def": 260,
+      "spd": 60,
       "range": 1,
-      "move": 3,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "combat-spec.v3.1§3",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
+      "hp": 1000
     },
-    "blade": {
-      "id": "blade",
-      "name": "刀",
-      "tier": "unspecified",
-      "atk": 10,
-      "def": 8,
-      "spd": 6,
-      "hpPer": 10,
+    {
+      "id": "ji",
+      "name": "戟兵",
+      "tier": "base",
+      "atk": 380,
+      "def": 320,
+      "spd": 55,
+      "range": 2,
+      "hp": 1100
+    },
+    {
+      "id": "gong",
+      "name": "弓兵",
+      "tier": "base",
+      "atk": 460,
+      "def": 180,
+      "spd": 65,
+      "range": 4,
+      "hp": 800
+    },
+    {
+      "id": "dun",
+      "name": "盾兵",
+      "tier": "base",
+      "atk": 240,
+      "def": 480,
+      "spd": 45,
       "range": 1,
-      "move": 2,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "combat-spec.v3.1§3",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
+      "hp": 1400
     },
-    "beast": {
-      "id": "beast",
-      "name": "神獸",
-      "tier": "unspecified",
-      "atk": 16,
-      "def": 12,
-      "spd": 6,
-      "hpPer": 40,
-      "range": 1,
-      "move": 2,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "combat-spec.v3.1§3",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
+    {
+      "id": "qi",
+      "name": "騎兵",
+      "tier": "base",
+      "atk": 520,
+      "def": 300,
+      "spd": 90,
+      "range": 2,
+      "hp": 1200
     },
-    "bow": {
-      "id": "bow",
-      "name": "弓",
-      "tier": "unspecified",
-      "atk": 11,
-      "def": 6,
-      "spd": 4,
-      "hpPer": 8,
-      "range": 3,
-      "move": 2,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "combat-spec.v3.1§3",
-        "hpPer": "pending-14.7",
-        "range": "combat-spec.v3.1§3",
-        "move": "pending-14.7"
-      }
-    },
-    "scholar": {
-      "id": "scholar",
+    {
+      "id": "xuezhe",
       "name": "學者",
-      "tier": "unspecified",
-      "atk": 12,
-      "def": 5,
-      "spd": 4,
-      "hpPer": 7,
+      "tier": "base",
+      "atk": 500,
+      "def": 200,
+      "spd": 70,
+      "range": 3,
+      "hp": 700
+    },
+    {
+      "id": "rui-dao",
+      "name": "銳刀",
+      "tier": "elite",
+      "atk": 630,
+      "def": 340,
+      "spd": 60,
+      "range": 1,
+      "hp": 1200
+    },
+    {
+      "id": "chang-ji",
+      "name": "長戟衛",
+      "tier": "elite",
+      "atk": 570,
+      "def": 420,
+      "spd": 55,
+      "range": 2,
+      "hp": 1320
+    },
+    {
+      "id": "qiang-nu",
+      "name": "強弩",
+      "tier": "elite",
+      "atk": 690,
+      "def": 235,
+      "spd": 65,
       "range": 5,
-      "move": 2,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "combat-spec.v3.1§3",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
+      "hp": 960
     },
-    "halberd": {
-      "id": "halberd",
-      "name": "戟",
-      "tier": "unspecified",
-      "atk": 10,
-      "def": 9,
-      "spd": 4,
-      "hpPer": 12,
+    {
+      "id": "tie-dun",
+      "name": "鐵盾",
+      "tier": "elite",
+      "atk": 360,
+      "def": 625,
+      "spd": 45,
       "range": 1,
-      "move": 2,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "combat-spec.v3.1§3",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
-    },
-    "shield": {
-      "id": "shield",
-      "name": "盾",
-      "tier": "unspecified",
-      "atk": 6,
-      "def": 14,
-      "spd": 3,
-      "hpPer": 16,
-      "range": 1,
-      "move": 1,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "combat-spec.v3.1§3",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
-    }
-  },
-  "pendingUnits": [
-    {
-      "id": "PENDING-08",
-      "name": "待補08",
-      "tier": "pending",
-      "atk": null,
-      "def": null,
-      "spd": null,
-      "hpPer": null,
-      "range": null,
-      "move": null,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "pending-14.7",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
+      "hp": 1680
     },
     {
-      "id": "PENDING-09",
-      "name": "待補09",
-      "tier": "pending",
-      "atk": null,
-      "def": null,
-      "spd": null,
-      "hpPer": null,
-      "range": null,
-      "move": null,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "pending-14.7",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
-    },
-    {
-      "id": "PENDING-10",
-      "name": "待補10",
-      "tier": "pending",
-      "atk": null,
-      "def": null,
-      "spd": null,
-      "hpPer": null,
-      "range": null,
-      "move": null,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "pending-14.7",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
-    },
-    {
-      "id": "PENDING-11",
-      "name": "待補11",
-      "tier": "pending",
-      "atk": null,
-      "def": null,
-      "spd": null,
-      "hpPer": null,
-      "range": null,
-      "move": null,
-      "source": {
-        "atk": "pending-14.7",
-        "def": "pending-14.7",
-        "spd": "pending-14.7",
-        "hpPer": "pending-14.7",
-        "range": "pending-14.7",
-        "move": "pending-14.7"
-      }
+      "id": "zhong-qi",
+      "name": "重騎",
+      "tier": "elite",
+      "atk": 780,
+      "def": 390,
+      "spd": 90,
+      "range": 2,
+      "hp": 1440
     }
   ],
   "targets": [
     {
       "id": "TARGET-A1",
-      "name": "靶A1",
-      "tier": "test",
-      "atk": 0,
+      "atk": 1000,
       "def": 0,
-      "spd": 0,
-      "hpPer": 0,
-      "range": 0,
-      "move": 0,
-      "source": {
-        "atk": "fixture",
-        "def": "fixture-def-0",
-        "spd": "fixture",
-        "hpPer": "fixture",
-        "range": "fixture",
-        "move": "fixture"
-      }
+      "hp": 99999
     },
     {
       "id": "TARGET-A2",
-      "name": "靶A2",
-      "tier": "test",
-      "atk": 0,
+      "atk": 1000,
       "def": 0,
-      "spd": 0,
-      "hpPer": 0,
-      "range": 0,
-      "move": 0,
-      "source": {
-        "atk": "fixture",
-        "def": "fixture-def-0",
-        "spd": "fixture",
-        "hpPer": "fixture",
-        "range": "fixture",
-        "move": "fixture"
-      }
+      "hp": 99999
     },
     {
       "id": "TARGET-A5",
-      "name": "靶A5",
-      "tier": "test",
-      "atk": 0,
+      "atk": 5832,
       "def": 0,
-      "spd": 0,
-      "hpPer": 0,
-      "range": 0,
-      "move": 0,
-      "source": {
-        "atk": "fixture",
-        "def": "fixture-def-0",
-        "spd": "fixture",
-        "hpPer": "fixture",
-        "range": "fixture",
-        "move": "fixture"
-      }
+      "hp": 99999
     }
   ],
-  "counter": [
-    { "attacker": "scholar", "defender": "bow", "relation": "counters" },
-    { "attacker": "bow", "defender": "shield", "relation": "counters" },
-    { "attacker": "shield", "defender": "blade", "relation": "counters" },
-    { "attacker": "blade", "defender": "halberd", "relation": "counters" },
-    { "attacker": "halberd", "defender": "cavalry", "relation": "counters" },
-    { "attacker": "cavalry", "defender": "scholar", "relation": "counters" },
-    { "attacker": "bow", "defender": "scholar", "relation": "countered-by" },
-    { "attacker": "shield", "defender": "bow", "relation": "countered-by" },
-    { "attacker": "blade", "defender": "shield", "relation": "countered-by" },
-    { "attacker": "halberd", "defender": "blade", "relation": "countered-by" },
-    { "attacker": "cavalry", "defender": "halberd", "relation": "countered-by" },
-    { "attacker": "scholar", "defender": "cavalry", "relation": "countered-by" }
-  ]
+  "counters": [
+    {
+      "attacker": "xuezhe",
+      "defender": "gong",
+      "mult": 1.25
+    },
+    {
+      "attacker": "gong",
+      "defender": "dun",
+      "mult": 1.25
+    },
+    {
+      "attacker": "dun",
+      "defender": "dao",
+      "mult": 1.25
+    },
+    {
+      "attacker": "dao",
+      "defender": "ji",
+      "mult": 1.25
+    },
+    {
+      "attacker": "ji",
+      "defender": "qi",
+      "mult": 1.25
+    },
+    {
+      "attacker": "qi",
+      "defender": "xuezhe",
+      "mult": 1.25
+    },
+    {
+      "attacker": "gong",
+      "defender": "xuezhe",
+      "mult": 0.8
+    },
+    {
+      "attacker": "dun",
+      "defender": "gong",
+      "mult": 0.8
+    },
+    {
+      "attacker": "dao",
+      "defender": "dun",
+      "mult": 0.8
+    },
+    {
+      "attacker": "ji",
+      "defender": "dao",
+      "mult": 0.8
+    },
+    {
+      "attacker": "qi",
+      "defender": "ji",
+      "mult": 0.8
+    },
+    {
+      "attacker": "xuezhe",
+      "defender": "qi",
+      "mult": 0.8
+    }
+  ],
+  "formula": {
+    "type": "linear-sub-def",
+    "rounding": "floor",
+    "minDamage": 0,
+    "defaultMorale": 1.0
+  },
+  "turnLimit": 15,
+  "turnLimitResult": "attacker-lose",
+  "aliases": {
+    "rui-dao": "dao",
+    "chang-ji": "ji",
+    "qiang-nu": "gong",
+    "tie-dun": "dun",
+    "zhong-qi": "qi"
+  }
 }

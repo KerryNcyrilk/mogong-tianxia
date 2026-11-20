@@ -34,6 +34,21 @@ export interface Squad {
   general: General | null
 }
 
+/** v4.0 combatant. Extra fields are allowed; these are the required ones. */
+export interface UnitSnapshot {
+  id: string
+  atk: number
+  def: number
+  spd: number
+  range: number
+  hp: number
+  side: Side
+  /** Formation slot. Same side and speed: lower index acts first. */
+  index?: number
+  x?: number
+  y?: number
+}
+
 export interface DamageInput {
   atk: number
   def: number
