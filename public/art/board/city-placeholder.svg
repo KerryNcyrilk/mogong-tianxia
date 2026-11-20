@@ -1,9 +1,159 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="2688" height="1920" viewBox="0 0 2688 1920">
-<desc>佔位色塊。畫布 2688×1920，格子 96×48，正交整數格。本圖依所給 JSON 繪製；測試夾具不是官方 31 區座標。</desc>
-<rect width="2688" height="1920" fill="#efe6d4"/>
-<g fill="none" stroke="#1b1712" stroke-width="1" opacity="0.28"><line x1="0" y1="0" x2="0" y2="960"/><line x1="96" y1="0" x2="96" y2="960"/><line x1="192" y1="0" x2="192" y2="960"/><line x1="288" y1="0" x2="288" y2="960"/><line x1="384" y1="0" x2="384" y2="960"/><line x1="480" y1="0" x2="480" y2="960"/><line x1="576" y1="0" x2="576" y2="960"/><line x1="672" y1="0" x2="672" y2="960"/><line x1="768" y1="0" x2="768" y2="960"/><line x1="864" y1="0" x2="864" y2="960"/><line x1="960" y1="0" x2="960" y2="960"/><line x1="1056" y1="0" x2="1056" y2="960"/><line x1="1152" y1="0" x2="1152" y2="960"/><line x1="1248" y1="0" x2="1248" y2="960"/><line x1="1344" y1="0" x2="1344" y2="960"/><line x1="1440" y1="0" x2="1440" y2="960"/><line x1="1536" y1="0" x2="1536" y2="960"/><line x1="1632" y1="0" x2="1632" y2="960"/><line x1="1728" y1="0" x2="1728" y2="960"/><line x1="1824" y1="0" x2="1824" y2="960"/><line x1="1920" y1="0" x2="1920" y2="960"/><line x1="2016" y1="0" x2="2016" y2="960"/><line x1="2112" y1="0" x2="2112" y2="960"/><line x1="2208" y1="0" x2="2208" y2="960"/><line x1="2304" y1="0" x2="2304" y2="960"/><line x1="2400" y1="0" x2="2400" y2="960"/><line x1="2496" y1="0" x2="2496" y2="960"/><line x1="2592" y1="0" x2="2592" y2="960"/><line x1="2688" y1="0" x2="2688" y2="960"/><line x1="0" y1="0" x2="2688" y2="0"/><line x1="0" y1="48" x2="2688" y2="48"/><line x1="0" y1="96" x2="2688" y2="96"/><line x1="0" y1="144" x2="2688" y2="144"/><line x1="0" y1="192" x2="2688" y2="192"/><line x1="0" y1="240" x2="2688" y2="240"/><line x1="0" y1="288" x2="2688" y2="288"/><line x1="0" y1="336" x2="2688" y2="336"/><line x1="0" y1="384" x2="2688" y2="384"/><line x1="0" y1="432" x2="2688" y2="432"/><line x1="0" y1="480" x2="2688" y2="480"/><line x1="0" y1="528" x2="2688" y2="528"/><line x1="0" y1="576" x2="2688" y2="576"/><line x1="0" y1="624" x2="2688" y2="624"/><line x1="0" y1="672" x2="2688" y2="672"/><line x1="0" y1="720" x2="2688" y2="720"/><line x1="0" y1="768" x2="2688" y2="768"/><line x1="0" y1="816" x2="2688" y2="816"/><line x1="0" y1="864" x2="2688" y2="864"/><line x1="0" y1="912" x2="2688" y2="912"/><line x1="0" y1="960" x2="2688" y2="960"/></g>
-<g id="zone-reserve-west" data-role="reserve" data-layer="ground"><title>預留西</title><rect x="576" y="48" width="288" height="144" fill="#8a6a32" stroke="#1b1712" stroke-width="2"/><text x="720" y="120" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">reserve-west</text></g><g id="zone-reserve-east" data-role="reserve" data-layer="ground"><title>預留東</title><rect x="960" y="48" width="288" height="144" fill="#8a6a32" stroke="#1b1712" stroke-width="2"/><text x="1104" y="120" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">reserve-east</text></g><g id="zone-pending-one" data-role="pending-gameplay" data-layer="ground"><title>待定甲</title><rect x="1824" y="48" width="288" height="96" fill="#6e675c" stroke="#1b1712" stroke-width="2"/><text x="1968" y="96" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">pending-one</text></g><g id="zone-pending-two" data-role="pending-gameplay" data-layer="ground"><title>待定乙</title><rect x="2208" y="48" width="288" height="96" fill="#6e675c" stroke="#1b1712" stroke-width="2"/><text x="2352" y="96" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">pending-two</text></g><g id="zone-pending-five" data-role="pending-gameplay" data-layer="ground"><title>待定戊</title><rect x="2208" y="192" width="288" height="96" fill="#6e675c" stroke="#1b1712" stroke-width="2"/><text x="2352" y="240" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">pending-five</text></g><g id="zone-pending-seven" data-role="pending-gameplay" data-layer="ground"><title>待定庚</title><rect x="576" y="288" width="672" height="96" fill="#6e675c" stroke="#1b1712" stroke-width="2"/><text x="912" y="336" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">pending-seven</text></g><g id="zone-pending-road" data-role="pending-gameplay" data-layer="road"><title>待定道路</title><rect x="1344" y="48" width="96" height="384" fill="#6e675c" stroke="#1b1712" stroke-width="2"/><text x="1392" y="240" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="12" fill="#f6efe2">pending-road</text></g><g id="zone-pending-six" data-role="pending-gameplay" data-layer="road"><title>待定己</title><rect x="96" y="288" width="384" height="96" fill="#6e675c" stroke="#1b1712" stroke-width="2"/><text x="288" y="336" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">pending-six</text></g><g id="zone-campus" data-role="building" data-layer="building"><title>校場</title><rect x="96" y="48" width="384" height="144" fill="#243e66" stroke="#1b1712" stroke-width="2"/><text x="288" y="120" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">campus</text></g><g id="zone-pending-three" data-role="pending-gameplay" data-layer="building"><title>待定丙</title><rect x="1536" y="192" width="192" height="96" fill="#6e675c" stroke="#1b1712" stroke-width="2"/><text x="1632" y="240" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">pending-three</text></g><g id="zone-pending-overlay" data-role="pending-gameplay" data-layer="overlay"><title>待定覆蓋</title><rect x="1536" y="48" width="192" height="96" fill="#6e675c" stroke="#1b1712" stroke-width="2"/><text x="1632" y="96" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">pending-overlay</text></g><g id="zone-pending-four" data-role="pending-gameplay" data-layer="overlay"><title>待定丁</title><rect x="1824" y="192" width="288" height="96" fill="#6e675c" stroke="#1b1712" stroke-width="2"/><text x="1968" y="240" text-anchor="middle" dominant-baseline="middle" font-family="WenQuanYi Micro Hei, sans-serif" font-size="18" fill="#f6efe2">pending-four</text></g>
-<text x="48" y="1020" font-family="WenQuanYi Micro Hei, sans-serif" font-size="28" fill="#1b1712">測試夾具 · 非交付座標 · 官方 31 區 cityLayout.json 尚未提供</text>
-<text x="48" y="1060" font-family="WenQuanYi Micro Hei, sans-serif" font-size="22" fill="#5c5348">canvas 2688×1920 · tile 96×48 · orthogonal · zones 12</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="2496" height="1440" viewBox="0 0 2496 1440">
+  <desc>主城佔位菱形。31 區，透明背景，無紋理無陰影。Artboard 2496×1440，origin (1056,192)。</desc>
+  <g id="zone-wall_n" data-layer="wall" data-kind="wall">
+    <title>城牆·北</title>
+    <polygon points="1056,192 2400,864 2352,888 1008,216" fill="#C8C6BE" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1704" y="540" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">wall_n</text>
+  </g>
+  <g id="zone-grove_nw" data-layer="deco" data-kind="tree">
+    <title>樹林·西北</title>
+    <polygon points="1296,360 1488,456 1392,504 1200,408" fill="#6B7038" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1344" y="432" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">grove_nw</text>
+  </g>
+  <g id="zone-grove_ne" data-layer="deco" data-kind="tree">
+    <title>樹林·東北</title>
+    <polygon points="1728,576 1776,600 1680,648 1632,624" fill="#6B7038" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1704" y="612" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">grove_ne</text>
+  </g>
+  <g id="zone-horse" data-layer="building" data-kind="stable">
+    <title>馬場</title>
+    <polygon points="1536,480 1728,576 1584,648 1392,552" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1560" y="564" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">horse</text>
+  </g>
+  <g id="zone-market" data-layer="building" data-kind="market">
+    <title>市場</title>
+    <polygon points="1824,624 2112,768 1968,840 1680,696" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1896" y="732" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">market</text>
+  </g>
+  <g id="zone-cherry" data-layer="deco" data-kind="cherry">
+    <title>花樹叢（櫻）</title>
+    <polygon points="2160,792 2304,864 2160,936 2016,864" fill="#6B7038" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="2160" y="864" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">cherry</text>
+  </g>
+  <g id="zone-shrine" data-layer="building" data-kind="shrine">
+    <title>宗廟（多層塔）</title>
+    <polygon points="1056,288 1200,360 1056,432 912,360" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1056" y="360" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">shrine</text>
+  </g>
+  <g id="zone-barrack" data-layer="building" data-kind="barrack">
+    <title>營房（4 間連排）</title>
+    <polygon points="1008,408 1200,504 1152,528 960,432" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1080" y="468" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">barrack</text>
+  </g>
+  <g id="zone-infirmary" data-layer="building" data-kind="clinic">
+    <title>醫館</title>
+    <polygon points="1920,864 2064,936 1920,1008 1776,936" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1920" y="936" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">infirmary</text>
+  </g>
+  <g id="zone-gov" data-layer="building" data-kind="gov">
+    <title>官府院落（8×9）</title>
+    <polygon points="1536,624 1920,816 1488,1032 1104,840" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1512" y="828" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">gov</text>
+  </g>
+  <g id="zone-road_v3" data-layer="ground" data-kind="road_minor">
+    <title>次道（校場東側）</title>
+    <polygon points="1344,576 1392,600 960,816 912,792" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1152" y="696" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">road_v3</text>
+  </g>
+  <g id="zone-road_v2" data-layer="ground" data-kind="road_minor">
+    <title>次道（官府東）</title>
+    <polygon points="1920,816 1968,840 1440,1104 1392,1080" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1680" y="960" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">road_v2</text>
+  </g>
+  <g id="zone-plaza" data-layer="ground" data-kind="plaza">
+    <title>官府前廣場（漢白玉）</title>
+    <polygon points="1104,840 1488,1032 1392,1080 1008,888" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1248" y="960" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">plaza</text>
+  </g>
+  <g id="zone-drill" data-layer="ground" data-kind="drill_field">
+    <title>校場（點兵場 7×9）</title>
+    <polygon points="960,432 1296,600 864,816 528,648" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="912" y="624" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">drill</text>
+  </g>
+  <g id="zone-drill_ground" data-layer="ground" data-kind="dirt">
+    <title>校場淨空區（夯土）</title>
+    <polygon points="960,480 1200,600 864,768 624,648" fill="#C9B292" stroke="#3A2A1C" stroke-width="2" stroke-dasharray="8 6"/>
+    <text x="912" y="624" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">drill_ground</text>
+  </g>
+  <g id="zone-house_w" data-layer="building" data-kind="house">
+    <title>民居·西（3 款 ×3）</title>
+    <polygon points="768,384 912,456 528,648 384,576" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="648" y="516" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">house_w</text>
+  </g>
+  <g id="zone-house_e" data-layer="building" data-kind="house">
+    <title>民居·東（3 款 ×3）</title>
+    <polygon points="1728,960 1920,1056 1632,1200 1440,1104" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1680" y="1080" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">house_e</text>
+  </g>
+  <g id="zone-road_h1" data-layer="ground" data-kind="road_minor">
+    <title>次道（校場南）</title>
+    <polygon points="384,576 912,840 864,864 336,600" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="624" y="720" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">road_h1</text>
+  </g>
+  <g id="zone-road_h2" data-layer="ground" data-kind="road_minor">
+    <title>次道（民居南）</title>
+    <polygon points="1008,888 1584,1176 1536,1200 960,912" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1272" y="1044" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">road_h2</text>
+  </g>
+  <g id="zone-road_main" data-layer="ground" data-kind="road_main">
+    <title>主幹道（2 tile）</title>
+    <polygon points="1392,600 1488,648 864,960 768,912" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1128" y="780" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">road_main</text>
+  </g>
+  <g id="zone-road_gate_link" data-layer="ground" data-kind="road_main">
+    <title>門前轉角路</title>
+    <polygon points="672,816 816,888 768,912 624,840" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="720" y="864" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">road_gate_link</text>
+  </g>
+  <g id="zone-farm" data-layer="ground" data-kind="farm">
+    <title>農田（格狀）</title>
+    <polygon points="480,672 720,792 624,840 384,720" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="552" y="756" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">farm</text>
+  </g>
+  <g id="zone-pond" data-layer="ground" data-kind="water">
+    <title>池塘</title>
+    <polygon points="1392,1128 1584,1224 1488,1272 1296,1176" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1440" y="1200" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">pond</text>
+  </g>
+  <g id="zone-herb" data-layer="ground" data-kind="farm">
+    <title>藥圃（資源田）</title>
+    <polygon points="1248,1056 1392,1128 1296,1176 1152,1104" fill="#7E9A56" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1272" y="1116" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">herb</text>
+  </g>
+  <g id="zone-storage" data-layer="building" data-kind="storage">
+    <title>倉庫（庫房）</title>
+    <polygon points="960,912 1104,984 1008,1032 864,960" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="984" y="972" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">storage</text>
+  </g>
+  <g id="zone-barracks" data-layer="building" data-kind="barracks">
+    <title>兵營</title>
+    <polygon points="1104,984 1248,1056 1152,1104 1008,1032" fill="#2C3A46" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1128" y="1044" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#F4F0E6">barracks</text>
+  </g>
+  <g id="zone-wall_w" data-layer="wall" data-kind="wall">
+    <title>城牆·西</title>
+    <polygon points="1008,216 1056,240 192,672 144,648" fill="#C8C6BE" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="600" y="444" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">wall_w</text>
+  </g>
+  <g id="zone-wall_e" data-layer="wall" data-kind="wall">
+    <title>城牆·東</title>
+    <polygon points="2304,864 2352,888 1488,1320 1440,1296" fill="#C8C6BE" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1896" y="1092" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">wall_e</text>
+  </g>
+  <g id="zone-wall_s_a" data-layer="wall" data-kind="wall">
+    <title>城牆·南（西段）</title>
+    <polygon points="144,648 528,840 480,864 96,672" fill="#C8C6BE" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="312" y="756" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">wall_s_a</text>
+  </g>
+  <g id="zone-wall_s_b" data-layer="wall" data-kind="wall">
+    <title>城牆·南（東段）</title>
+    <polygon points="672,912 1488,1320 1440,1344 624,936" fill="#C8C6BE" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="1056" y="1128" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">wall_s_b</text>
+  </g>
+  <g id="zone-gate_s" data-layer="wall" data-kind="gate">
+    <title>南門（唯一城門）</title>
+    <polygon points="576,816 720,888 624,936 480,864" fill="#C8C6BE" stroke="#3A2A1C" stroke-width="2"/>
+    <text x="600" y="876" text-anchor="middle" dominant-baseline="middle" font-family="sans-serif" font-size="14" fill="#1A120C">gate_s</text>
+  </g>
 </svg>
