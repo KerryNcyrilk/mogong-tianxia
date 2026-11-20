@@ -48,3 +48,22 @@ body {
 #root {
   min-height: 100vh;
 }
+
+.city-frame button {
+  font: inherit;
+  margin: 0;
+  appearance: none;
+}
+
+.city-frame button:focus-visible {
+  outline: 1px solid #c8a96b;
+  outline-offset: -1px;
+}
+
+.city-frame button:not(:disabled):hover .city-face {
+  background: #3a2a1c !important;
+}
+
+.city-frame input::placeholder {
+  color: #9c8f78;
+}
