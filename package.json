@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "vitest run",
+    "city-check": "node scripts/city-check.mjs",
+    "city-preview": "node scripts/city-preview.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

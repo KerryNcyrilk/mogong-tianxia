@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "units.v4.0",
+  "source": "combat-spec.v4.0 §1（豆包重寫，唯一真表）",
+  "units": [
+    {
+      "id": "dao",
+      "name": "刀兵",
+      "tier": "base",
+      "atk": 420,
+      "def": 260,
+      "spd": 60,
+      "range": 1,
+      "hp": 1000
+    },
+    {
+      "id": "ji",
+      "name": "戟兵",
+      "tier": "base",
+      "atk": 380,
+      "def": 320,
+      "spd": 55,
+      "range": 2,
+      "hp": 1100
+    },
+    {
+      "id": "gong",
+      "name": "弓兵",
+      "tier": "base",
+      "atk": 460,
+      "def": 180,
+      "spd": 65,
+      "range": 4,
+      "hp": 800
+    },
+    {
+      "id": "dun",
+      "name": "盾兵",
+      "tier": "base",
+      "atk": 240,
+      "def": 480,
+      "spd": 45,
+      "range": 1,
+      "hp": 1400
+    },
+    {
+      "id": "qi",
+      "name": "騎兵",
+      "tier": "base",
+      "atk": 520,
+      "def": 300,
+      "spd": 90,
+      "range": 2,
+      "hp": 1200
+    },
+    {
+      "id": "xuezhe",
+      "name": "學者",
+      "tier": "base",
+      "atk": 500,
+      "def": 200,
+      "spd": 70,
+      "range": 3,
+      "hp": 700
+    },
+    {
+      "id": "rui-dao",
+      "name": "銳刀",
+      "tier": "elite",
+      "atk": 630,
+      "def": 340,
+      "spd": 60,
+      "range": 1,
+      "hp": 1200
+    },
+    {
+      "id": "chang-ji",
+      "name": "長戟衛",
+      "tier": "elite",
+      "atk": 570,
+      "def": 420,
+      "spd": 55,
+      "range": 2,
+      "hp": 1320
+    },
+    {
+      "id": "qiang-nu",
+      "name": "強弩",
+      "tier": "elite",
+      "atk": 690,
+      "def": 235,
+      "spd": 65,
+      "range": 5,
+      "hp": 960
+    },
+    {
+      "id": "tie-dun",
+      "name": "鐵盾",
+      "tier": "elite",
+      "atk": 360,
+      "def": 625,
+      "spd": 45,
+      "range": 1,
+      "hp": 1680
+    },
+    {
+      "id": "zhong-qi",
+      "name": "重騎",
+      "tier": "elite",
+      "atk": 780,
+      "def": 390,
+      "spd": 90,
+      "range": 2,
+      "hp": 1440
+    }
+  ],
+  "targets": [
+    {
+      "id": "TARGET-A1",
+      "atk": 1000,
+      "def": 0,
+      "hp": 99999
+    },
+    {
+      "id": "TARGET-A2",
+      "atk": 1000,
+      "def": 0,
+      "hp": 99999
+    },
+    {
+      "id": "TARGET-A5",
+      "atk": 5832,
+      "def": 0,
+      "hp": 99999
+    }
+  ],
+  "counters": [
+    {
+      "attacker": "xuezhe",
+      "defender": "gong",
+      "mult": 1.25
+    },
+    {
+      "attacker": "gong",
+      "defender": "dun",
+      "mult": 1.25
+    },
+    {
+      "attacker": "dun",
+      "defender": "dao",
+      "mult": 1.25
+    },
+    {
+      "attacker": "dao",
+      "defender": "ji",
+      "mult": 1.25
+    },
+    {
+      "attacker": "ji",
+      "defender": "qi",
+      "mult": 1.25
+    },
+    {
+      "attacker": "qi",
+      "defender": "xuezhe",
+      "mult": 1.25
+    },
+    {
+      "attacker": "gong",
+      "defender": "xuezhe",
+      "mult": 0.8
+    },
+    {
+      "attacker": "dun",
+      "defender": "gong",
+      "mult": 0.8
+    },
+    {
+      "attacker": "dao",
+      "defender": "dun",
+      "mult": 0.8
+    },
+    {
+      "attacker": "ji",
+      "defender": "dao",
+      "mult": 0.8
+    },
+    {
+      "attacker": "qi",
+      "defender": "ji",
+      "mult": 0.8
+    },
+    {
+      "attacker": "xuezhe",
+      "defender": "qi",
+      "mult": 0.8
+    }
+  ],
+  "formula": {
+    "type": "linear-sub-def",
+    "rounding": "floor",
+    "minDamage": 0,
+    "defaultMorale": 1.0
+  },
+  "turnLimit": 15,
+  "turnLimitResult": "attacker-lose",
+  "aliases": {
+    "rui-dao": "dao",
+    "chang-ji": "ji",
+    "qiang-nu": "gong",
+    "tie-dun": "dun",
+    "zhong-qi": "qi"
+  }
+}
