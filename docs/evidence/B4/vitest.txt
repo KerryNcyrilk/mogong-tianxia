@@ -1,0 +1,11 @@
+$ npx vitest run
+
+ RUN  v5.1.1 /agent/repos/mogong-tianxia
+
+
+ Test Files  3 passed (3)
+      Tests  58 passed (58)
+   Start at  16:50:54
+   Duration  150ms (transform 36%, import 32%, tests 26%, worker 7%)
+
+exit:0

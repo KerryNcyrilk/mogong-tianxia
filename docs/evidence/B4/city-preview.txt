@@ -1,0 +1,4 @@
+$ node scripts/city-preview.mjs
+/agent/repos/mogong-tianxia/public/art/board/city-placeholder.svg
+2496×1440
+exit:0

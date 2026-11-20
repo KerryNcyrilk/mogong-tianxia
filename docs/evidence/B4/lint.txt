@@ -1,0 +1,6 @@
+$ npm run lint
+
+> mogong-tianxia@0.1.0 lint
+> oxlint
+
+exit:0

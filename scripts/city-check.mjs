@@ -1,5 +1,5 @@
 import { CELL, COLS, ROWS, TILE_H } from "../src/city/coords.ts"
-import { loadCityLayoutFile } from "../src/city/layout.ts"
+import { loadCityLayoutFile } from "../src/city/layout.node.ts"
 
 /** Ids in data/cityLayout.json order. md5 e380c3abaea0e451008b2c03fcd5ae13. */
 const EXPECTED_IDS = [
