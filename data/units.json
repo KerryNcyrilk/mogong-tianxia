@@ -1,0 +1,12 @@
+{
+  "note": "沙盒展示用兵種底材。速度、克制、英雄係數與傷害下限以戰鬥核心和 balance.json 為準，此檔不得覆蓋驗收夾具。",
+  "units": {
+    "cavalry": { "atk": 14, "def": 8, "hpPer": 12, "range": 1, "move": 3 },
+    "blade": { "atk": 10, "def": 8, "hpPer": 10, "range": 1, "move": 2 },
+    "beast": { "atk": 16, "def": 12, "hpPer": 40, "range": 1, "move": 2 },
+    "bow": { "atk": 11, "def": 6, "hpPer": 8, "range": 3, "move": 2 },
+    "scholar": { "atk": 12, "def": 5, "hpPer": 7, "range": 5, "move": 2 },
+    "halberd": { "atk": 10, "def": 9, "hpPer": 12, "range": 1, "move": 2 },
+    "shield": { "atk": 6, "def": 14, "hpPer": 16, "range": 1, "move": 1 }
+  }
+}
