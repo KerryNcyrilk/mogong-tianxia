@@ -10,6 +10,7 @@
     "test": "vitest run",
     "city-check": "node scripts/city-check.mjs",
     "city-preview": "node scripts/city-preview.mjs",
+    "city-table": "node scripts/city-table.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
