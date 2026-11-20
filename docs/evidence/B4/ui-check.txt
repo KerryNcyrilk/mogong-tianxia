@@ -1,0 +1,9 @@
+$ node scripts/ui-check.mjs
+areas: 4 (276+391+455+158=1280) gaps: 0
+style: PASS (alpha 1.00, border 2px/1px)
+scale: PASS (639 values, 1920 = 1280*1.5)
+safe: PASS (gov/drill/gate_s inside, ui intersects safe=0)
+camera: PASS (4 zooms, ui fixed)
+typography: PASS (min 10/12px, hit 32, ring 44)
+combat-frozen: PASS (3 entries disabled, imports 0)
+exit:0
