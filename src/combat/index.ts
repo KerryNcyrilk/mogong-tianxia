@@ -1,7 +1,8 @@
 export { balance } from "./balance.ts"
 export { createBattle, isAlive, runBattle, sideHp, step } from "./battle.ts"
 export type { BattleEvent, BattleState } from "./battle.ts"
-export { COUNTER_TARGET, counterMultiplier } from "./counter.ts"
+export { COUNTER_PAIRS, COUNTER_TARGET, counterMultiplier } from "./counter.ts"
+export type { CounterPair } from "./counter.ts"
 export {
   attackPrime,
   calculateDamage,
