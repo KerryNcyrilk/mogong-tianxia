@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 import { ROWS, zoneToProjectedPolygon } from "../src/city/coords.ts"
-import { loadCityLayoutFile } from "../src/city/layout.ts"
+import { loadCityLayoutFile } from "../src/city/layout.node.ts"
 
 const ARTBOARD_W = 2496
 const ARTBOARD_H = 1440

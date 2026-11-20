@@ -4,8 +4,6 @@
  * v1 role / builtin / campus / kebab-case ids are not accepted.
  * barrack (營房) and barracks (兵營) are different kinds.
  */
-import { readFileSync } from "node:fs"
-import { fileURLToPath } from "node:url"
 import { CELL, COLS, ROWS, TILE_H } from "./coords.ts"
 
 const ID_PATTERN = /^[a-z0-9]+(_[a-z0-9]+)*$/
@@ -72,8 +70,6 @@ export interface CityLayout {
   grid: CityGrid
   zones: CityZone[]
 }
-
-const defaultLayoutPath = fileURLToPath(new URL("../../data/cityLayout.json", import.meta.url))
 
 function fail(message: string): never {
   throw new Error(`city layout: ${message}`)
@@ -184,9 +180,4 @@ export function loadCityLayout(json: string): CityLayout {
     throw new Error(message)
   }
   return parseCityLayout(parsed)
-}
-
-/** Node-only. Scripts call this; the browser should pass JSON text to loadCityLayout. */
-export function loadCityLayoutFile(path: string = defaultLayoutPath): CityLayout {
-  return loadCityLayout(readFileSync(path, "utf8"))
 }

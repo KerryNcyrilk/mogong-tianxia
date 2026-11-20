@@ -22,5 +22,5 @@ export type {
   TilePoint,
   ZoneFootprint,
 } from "./coords.ts"
-export { LAYERS, ZONE_KINDS, loadCityLayout, loadCityLayoutFile, parseCityLayout } from "./layout.ts"
+export { LAYERS, ZONE_KINDS, loadCityLayout, parseCityLayout } from "./layout.ts"
 export type { CityGrid, CityLayer, CityLayout, CityMeta, CityZone, ZoneKind } from "./layout.ts"
