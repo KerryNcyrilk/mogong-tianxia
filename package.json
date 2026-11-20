@@ -11,6 +11,8 @@
     "city-check": "node scripts/city-check.mjs",
     "city-preview": "node scripts/city-preview.mjs",
     "city-table": "node scripts/city-table.mjs",
+    "ui-check": "node scripts/ui-check.mjs",
+    "ui-table": "node scripts/ui-table.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
