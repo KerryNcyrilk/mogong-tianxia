@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "city-layout.fixture.v1",
+  "delivery": false,
+  "source": "測試夾具。這 12 區是為了驗證載入、結構、檢查與預覽而造的合成座標，不是交付座標。官方 31 區 cityLayout.json 尚未提供，本檔沒有採用它，也沒有採用任何其他副本。",
+  "zones": [
+    {
+      "id": "campus",
+      "name": "校場",
+      "role": "building",
+      "rect": { "x": 1, "y": 1, "w": 4, "h": 3 },
+      "layer": "building",
+      "builtin": true
+    },
+    {
+      "id": "reserve-west",
+      "name": "預留西",
+      "role": "reserve",
+      "rect": { "x": 6, "y": 1, "w": 3, "h": 3 },
+      "layer": "ground",
+      "builtin": true
+    },
+    {
+      "id": "reserve-east",
+      "name": "預留東",
+      "role": "reserve",
+      "rect": { "x": 10, "y": 1, "w": 3, "h": 3 },
+      "layer": "ground",
+      "builtin": true
+    },
+    {
+      "id": "pending-road",
+      "name": "待定道路",
+      "role": "pending-gameplay",
+      "rect": { "x": 14, "y": 1, "w": 1, "h": 8 },
+      "layer": "road",
+      "builtin": false
+    },
+    {
+      "id": "pending-overlay",
+      "name": "待定覆蓋",
+      "role": "pending-gameplay",
+      "rect": { "x": 16, "y": 1, "w": 2, "h": 2 },
+      "layer": "overlay",
+      "builtin": false
+    },
+    {
+      "id": "pending-one",
+      "name": "待定甲",
+      "role": "pending-gameplay",
+      "rect": { "x": 19, "y": 1, "w": 3, "h": 2 },
+      "layer": "ground",
+      "builtin": false
+    },
+    {
+      "id": "pending-two",
+      "name": "待定乙",
+      "role": "pending-gameplay",
+      "rect": { "x": 23, "y": 1, "w": 3, "h": 2 },
+      "layer": "ground",
+      "builtin": false
+    },
+    {
+      "id": "pending-three",
+      "name": "待定丙",
+      "role": "pending-gameplay",
+      "rect": { "x": 16, "y": 4, "w": 2, "h": 2 },
+      "layer": "building",
+      "builtin": false
+    },
+    {
+      "id": "pending-four",
+      "name": "待定丁",
+      "role": "pending-gameplay",
+      "rect": { "x": 19, "y": 4, "w": 3, "h": 2 },
+      "layer": "overlay",
+      "builtin": false
+    },
+    {
+      "id": "pending-five",
+      "name": "待定戊",
+      "role": "pending-gameplay",
+      "rect": { "x": 23, "y": 4, "w": 3, "h": 2 },
+      "layer": "ground",
+      "builtin": false
+    },
+    {
+      "id": "pending-six",
+      "name": "待定己",
+      "role": "pending-gameplay",
+      "rect": { "x": 1, "y": 6, "w": 4, "h": 2 },
+      "layer": "road",
+      "builtin": false
+    },
+    {
+      "id": "pending-seven",
+      "name": "待定庚",
+      "role": "pending-gameplay",
+      "rect": { "x": 6, "y": 6, "w": 7, "h": 2 },
+      "layer": "ground",
+      "builtin": false
+    }
+  ]
+}
