@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "name": "墨攻天下 · 主城結構圖",
+    "version": "1.0",
+    "author": "豆包（主设计）",
+    "date": "2026-11-19",
+    "consumer": ["Rowan（程式／cityLayout.json）", "Iris（美術落位）"],
+    "evidence": "交付\\主城畫面_復刻規格_v2.md §4–§5；原版截圖 參考\\原版主城\\",
+    "note": "本檔為唯一座標權威。美術與程式都照此，唔可以自行重排。"
+  },
+  "grid": {
+    "tile_px": 96,
+    "tile_h_px": 48,
+    "cols": 28,
+    "rows": 20,
+    "logical_plane_px": { "width": 2688, "height": 1920, "note": "28×96 / 20×96，只係正交規劃平面（即係格線圖嗰個坐標系），唔係渲染尺寸" },
+    "projected_plane_px": { "width": 2304, "height": 1152, "formula": "(28+20)×48 = 2304 闊；(28+20)×24 = 1152 高", "note": "2:1 菱形投影之後嘅城市平面，四個角係菱形尖" },
+    "artboard_default": {
+      "width": 2496,
+      "height": 1440,
+      "margin": { "left": 96, "right": 96, "top": 192, "bottom": 96 },
+      "note": "P0 底圖／灰盒 Artboard 用呢個：2304×1152 平面 + 左右各 96、上 192（北牆立面＋屋簷溢出）、下 96（南牆立面）"
+    },
+    "axis": "x 由左至右、y 由上至下；tile (x,y) 指左上角；z 軸向上",
+    "projection": "2.5D 斜 45 度、2:1 菱形格：邏輯格闊 96px、投影高 48px（同戰鬥 tile 96 對齊）",
+    "logical_vs_projected": "所有 zone 的 x/y/w/h 都係『邏輯格』；渲染時每個邏輯格投影為 96×48 菱形。唔准把 96 當成菱形高，亦唔准用 2688×1920 做烘焙尺寸。",
+    "camera_default": {
+      "viewport": "16:9（基準 1280×720）",
+      "zoom": 0.5,
+      "zoom_meaning": "鏡頭倍率＝螢幕像素 / 投影世界像素（唔係世界像素比）。0.5＝投影世界縮一半：2304×1152 顯示成 1152×576，喺 1280×720 內左右各留 64px、上下各留 72px。",
+      "focus_tile": [13, 10],
+      "offset": [96, 0],
+      "offset_meaning": "螢幕空間平移（px），以 1280×720 為基準。+96 令校場左邊界落在螢幕 x=288（安全區 276 之內），避免被左欄壓住。",
+      "ui_scale_rule": "1920×1080 時 UI 與世界同樣 ×1.5，所以 offset 同 safe_rect 一律 ×1.5（唔可以只放大 UI 而 offset 不變，否則校場會跌入左欄）。",
+      "offset_1920": [144, 0],
+      "safe_rect": [276, 0, 1004, 650],
+      "safe_rect_1920": [414, 0, 1506, 975],
+      "clamp": "鏡頭邊界鎖在城牆內（x 1–26、y 1–18）",
+      "zoom_range": [0.4, 1.2],
+      "zoom_note": "0.4＝睇全景兼見到城外草地邊；1.2＝貼近官府／市場睇細節。1.0 以上會超出 artboard，需要外擴背景草地 192px。"
+    }
+  },
+  "ground": {
+    "base": "草地綠 #7E9A56",
+    "palette": {
+      "grass": "#7E9A56",
+      "grass_dark": "#6B8748",
+      "stone_road": "#BDB7A6",
+      "stone_plaza": "#D8D3C6",
+      "dirt_drill": "#C9B292",
+      "roof_blue": "#6E8A96",
+      "roof_dark": "#4F5F63",
+      "wall_brick": "#8E9090",
+      "wall_rammed": "#B99A6B",
+      "pillar_red": "#A5342A",
+      "cherry": "#D98DA8",
+      "water": "#5B8FA8"
+    }
+  },
+  "zones": [
+    { "id": "wall_n",  "name": "城牆·北",   "x": 0,  "y": 0,  "w": 28, "h": 1,  "layer": "wall",     "kind": "wall",    "sprite": "wall_seg_96x72",  "note": "可平鋪，垛口每 12–14px 一個" },
+    { "id": "wall_w",  "name": "城牆·西",   "x": 0,  "y": 1,  "w": 1,  "h": 18, "layer": "wall",     "kind": "wall",    "sprite": "wall_seg_96x72" },
+    { "id": "wall_e",  "name": "城牆·東",   "x": 27, "y": 1,  "w": 1,  "h": 18, "layer": "wall",     "kind": "wall",    "sprite": "wall_seg_96x72" },
+    { "id": "wall_s_a","name": "城牆·南（西段）", "x": 0, "y": 19, "w": 8, "h": 1, "layer": "wall",   "kind": "wall",    "sprite": "wall_seg_96x72" },
+    { "id": "wall_s_b","name": "城牆·南（東段）", "x": 11,"y": 19, "w": 17,"h": 1, "layer": "wall",   "kind": "wall",    "sprite": "wall_seg_96x72" },
+    { "id": "gate_s",  "name": "南門（唯一城門）", "x": 8, "y": 18, "w": 3, "h": 2, "layer": "wall", "kind": "gate",   "sprite": "gate_220x200",   "note": "雙層門樓；拱門喺 (9.5,19)；偏左＝原版特徵，唔可以移去正中" },
+    { "id": "road_main", "name": "主幹道（2 tile）", "x": 12, "y": 5, "w": 2, "h": 13, "layer": "ground", "kind": "road_main", "sprite": "baked", "note": "由前廣場南下到南門轉角；非畫面正中" },
+    { "id": "road_gate_link", "name": "門前轉角路", "x": 9, "y": 17, "w": 3, "h": 1, "layer": "ground", "kind": "road_main", "sprite": "baked" },
+    { "id": "road_v3", "name": "次道（校場東側）", "x": 11, "y": 5, "w": 1, "h": 9, "layer": "ground", "kind": "road_minor", "sprite": "baked" },
+    { "id": "road_h1", "name": "次道（校場南）", "x": 1, "y": 15, "w": 11, "h": 1, "layer": "ground", "kind": "road_minor", "sprite": "baked" },
+    { "id": "road_h2", "name": "次道（民居南）", "x": 14, "y": 15, "w": 12, "h": 1, "layer": "ground", "kind": "road_minor", "sprite": "baked" },
+    { "id": "road_v2", "name": "次道（官府東）", "x": 22, "y": 4, "w": 1, "h": 11, "layer": "ground", "kind": "road_minor", "sprite": "baked" },
+    { "id": "plaza",   "name": "官府前廣場（漢白玉）", "x": 14, "y": 13, "w": 8, "h": 2, "layer": "ground", "kind": "plaza", "sprite": "baked", "note": "淺色石鋪、左右兩條踏道；唔可以當草地" },
+    { "id": "gov",     "name": "官府院落（8×9）", "x": 14, "y": 4, "w": 8, "h": 9, "layer": "building", "kind": "gov", "sprite": "gov_compound_768x960", "note": "中央偏右；外院牆＋門樓＋三層白台基主殿＋左右配殿迴廊" },
+    { "id": "drill",   "name": "校場（點兵場 7×9）", "x": 4, "y": 6, "w": 7, "h": 9, "layer": "ground", "kind": "drill_field", "sprite": "drill_ring_672x864", "note": "白石矮牆圍一圈；內部淨空，唔可以放任何建築" },
+    { "id": "drill_ground", "name": "校場淨空區（夯土）", "x": 5, "y": 7, "w": 5, "h": 7, "layer": "ground", "kind": "dirt", "sprite": "baked", "note": "淨空規則見 clear_rules" },
+    { "id": "barrack", "name": "營房（4 間連排）", "x": 4, "y": 5, "w": 4, "h": 1, "layer": "building", "kind": "barrack", "sprite": "barrack_160x110", "count": 4 },
+    { "id": "horse",   "name": "馬場", "x": 11, "y": 1, "w": 4, "h": 3, "layer": "building", "kind": "stable", "sprite": "stable_384x288", "note": "木圍欄＋白氈帳篷＋馬匹" },
+    { "id": "market",  "name": "市場", "x": 17, "y": 1, "w": 6, "h": 3, "layer": "building", "kind": "market", "sprite": "market_576x288", "note": "開放式棚屋＋布幡＋貨堆，無正式院牆" },
+    { "id": "infirmary", "name": "醫館", "x": 23, "y": 5, "w": 3, "h": 3, "layer": "building", "kind": "clinic", "sprite": "clinic_288x288" },
+    { "id": "shrine",  "name": "宗廟（多層塔）", "x": 2, "y": 2, "w": 3, "h": 3, "layer": "building", "kind": "shrine", "sprite": "shrine_288x288_h300", "note": "3 層簷、抬高台，係城內最高嘅獨立體量" },
+    { "id": "house_w", "name": "民居·西（3 款 ×3）", "x": 1, "y": 7, "w": 3, "h": 8, "layer": "building", "kind": "house", "sprite": "house_130x100", "count": 9, "note": "青灰瓦小院、泥土院牆、菜園" },
+    { "id": "house_e", "name": "民居·東（3 款 ×3）", "x": 23, "y": 9, "w": 4, "h": 6, "layer": "building", "kind": "house", "sprite": "house_130x100", "count": 9 },
+    { "id": "farm",    "name": "農田（格狀）", "x": 4, "y": 16, "w": 5, "h": 2, "layer": "ground", "kind": "farm", "sprite": "baked", "note": "有灌溉溝；貼南牆內側" },
+    { "id": "pond",    "name": "池塘", "x": 23, "y": 16, "w": 4, "h": 2, "layer": "ground", "kind": "water", "sprite": "pond_384x192", "note": "4 幀水波循環＋岸邊柳樹" },
+    { "id": "cherry",  "name": "花樹叢（櫻）", "x": 24, "y": 1, "w": 3, "h": 3, "layer": "deco", "kind": "cherry", "sprite": "cherry_180x140", "count": 4, "note": "全圖唯一高飽和色塊，用嚟平衡；唔可以散開擺" },
+    { "id": "grove_nw", "name": "樹林·西北", "x": 6,  "y": 1, "w": 4, "h": 2, "layer": "deco", "kind": "tree", "sprite": "tree_120x160", "count": 6 },
+    { "id": "grove_ne", "name": "樹林·東北", "x": 15, "y": 1, "w": 1, "h": 2, "layer": "deco", "kind": "tree", "sprite": "tree_120x160", "count": 2, "note": "馬場與市場之間嘅過渡樹帶" },
+    { "id": "storage", "name": "倉庫（庫房）", "x": 14, "y": 16, "w": 3, "h": 2, "layer": "building", "kind": "storage", "sprite": "storage_288x192", "note": "深紅棕瓦大院；對應左欄資源上限，係城建升級嘅前置" },
+    { "id": "barracks", "name": "兵營", "x": 17, "y": 16, "w": 3, "h": 2, "layer": "building", "kind": "barracks", "sprite": "barracks_288x192", "note": "招募／駐兵；同校場分開（校場只管操練）" },
+    { "id": "herb", "name": "藥圃（資源田）", "x": 20, "y": 16, "w": 3, "h": 2, "layer": "ground", "kind": "farm", "sprite": "baked", "note": "城內唯一非糧食資源田；其餘資源田（伐木／礦／石）在城外大地圖" }
+  ],
+  "anchors": [
+    { "name": "南門拱門中心", "x": 9.5, "y": 19.0, "note": "出城／回城動效原點" },
+    { "name": "官府主殿正門", "x": 18.0, "y": 8.0, "note": "鏡頭預設焦點偏右" },
+    { "name": "官府前廣場中心", "x": 18.0, "y": 14.0 },
+    { "name": "校場中心", "x": 7.5, "y": 10.5, "note": "點兵動效（日後）嘅中心點" },
+    { "name": "校場四角旗杆", "points": [[4.5, 6.5], [10.5, 6.5], [4.5, 14.5], [10.5, 14.5]] },
+    { "name": "市場中心", "x": 20.0, "y": 2.5 },
+    { "name": "池塘中心", "x": 25.0, "y": 17.0 }
+  ],
+  "clear_rules": [
+    "校場內部（tile x5–9、y7–13）必須保持空：唔准放建築、樹、旗以外嘅裝飾、NPC。",
+    "官府院落（x14–21、y4–12）內只准官府自身組件（主殿、配殿、院牆、門樓、石階、院內草地／花樹／立石）。",
+    "主幹道（x12–13、y5–17）唔准有任何物件壓住；路口交叉位要留出至少 1 tile 空地。",
+    "城牆內側 1 tile（x1 / x26 / y1 / y18）係【地面草帶】，唔係【淨空帶】：貼牆建築（民居、市場、宗廟、花樹、樹林）可以坐落草帶上，但地面仍要見到至少 0.5 tile 連續草地，唔准把草地完全鋪成石面；城牆立面本身唔准被任何 sprite 遮住超過 1/3 高。",
+    "所有建築貼路擺：建築嘅外框要接到最近嘅石板路，唔可以漂浮喺草地中間。",
+    "【建築間距】只約束同類量產建築：民居之間、資源田之間最少留 1 tile。地標建築（官府／市場／馬場／宗廟／營房／倉庫／兵營）之間可以互貼，因為原版本身就係密集院落式排列；實際要求改為相鄰 sprite 嘅「遮擋率」——上層 sprite 遮住鄰居主體立面唔可以超過 25%，遮住窗／門／匾額即算違規。"
+  ],
+  "sprite_rules": {
+    "anchor": "所有 sprite 錨點 = 底部中心（foot anchor），世界座標 y 值以腳底為準",
+    "sorting": "按 anchor.y 由細至大繪製（y 大者後畫＝在上）",
+    "wall_segments": "城牆分 3 段（北／西／東／南兩段）分別繪製，令城內物件可以夾喺牆前後",
+    "oversize": "sprite 可以大過佔地範圍（例如主殿屋簷伸出），但腳底落位必須對正佔地中心，伸出量 ≤ 0.5 tile",
+    "padding": "每張 sprite 四周留 8px 透明邊，避免採樣漏色；相鄰 sprite 之間保持 1–2px 重疊，避免草地露縫",
+    "shadow": "陰影唔可以烘死喺 sprite 內（除底圖烘焙），建築用統一半透明橢圓陰影圖層",
+    "canvas_formula": {
+      "ground_projection_w": "(w + h) × 48",
+      "ground_projection_h": "(w + h) × 24",
+      "canvas_w": "(w + h) × 48 + 24（左右各 12px 出血）",
+      "canvas_h": "(w + h) × 24 + H + 16（H＝該資產立面高，上下各 8px）",
+      "note": "2:1 等距畫布。四角為菱形尖，唔係 96 正方 AABB；舊寫法 768×960／672×864／96×72 作廢。"
+    },
+    "build_height_px": {
+      "gov": 300, "shrine": 360, "gate": 224, "market": 130, "clinic": 130,
+      "storage": 130, "barracks": 130, "house": 110, "stable": 90, "barrack": 60,
+      "drill_wall": 140, "wall": 96, "tree": 160, "cherry": 90
+    },
+    "canvas_official": {
+      "gov_8x9": "832×720",
+      "drill_7x9": "784×536",
+      "gate_3x2": "256×360",
+      "wall_seg_4x1": "256×232",
+      "note": "城牆以 4 tile 為一段烘，北／南／西／東都同一尺寸，可平鋪亦可鏡像；唔准用單一 96×72。"
+    }
+  },
+  "naming": {
+    "format": "<zone_id>_<variant>_<w>x<h>.png",
+    "example": "house_w_v1_130x100.png",
+    "atlas": "每個 zone 一組圖集；全城圖集 ≤ 2 張 2048×2048"
+  },
+  "ui": {
+    "spec": "交付\\主城UI\\主城UI版面規格_v1.md",
+    "baseline": [1280, 720],
+    "scale_1920": 1.5,
+    "hard_rules": [
+      "貼邊實框：alpha ≥ 0.95，2px 深棕描邊 + 1px 內金線；唔准半透明懸浮。",
+      "UI 尺寸固定，世界 zoom 0.4–1.2 時 UI 不動；左欄永遠 276px（1920 版 414）。",
+      "安全區 (276,0)-(1280,650) 內唔准 UI 覆蓋官府／校場／南門任一主體。"
+    ],
+    "safe_rect": [276, 0, 1004, 650],
+    "panels": [
+      { "id": "left_column", "x": 0, "y": 0, "w": 276, "h": 720 },
+      { "id": "chat", "x": 276, "y": 650, "w": 391, "h": 70 },
+      { "id": "func_grid", "x": 667, "y": 650, "w": 455, "h": 70 },
+      { "id": "build_queue", "x": 1122, "y": 650, "w": 158, "h": 70 },
+      { "id": "round_buttons", "x": 1206, "y": 8, "w": 44, "h": 152, "note": "3 顆 Ø40，中心 y＝28/72/116" }
+    ],
+    "resources_order": ["人口", "玉石", "刀幣", "糧食", "木材", "生鐵", "石頭"],
+    "resource_format": { "人口": "單值", "玉石": "純數值", "刀幣": "純數值", "糧食": "現有/上限", "木材": "現有/上限", "生鐵": "現有/上限", "石頭": "現有/上限" },
+    "build_queue": { "slots": 3, "in_progress": 2, "queued": 1, "line1": "建築名＋等級", "line2": "倒數 HH:MM:SS", "status_bar": "綠在建／灰排隊／金完成" },
+    "colors": { "panel": "#2B1F17", "panel_top": "#3A2A1C", "stroke": "#1A120C", "gold": "#C8A96B", "text": "#E8DCC0", "text_dim": "#9C8F78", "success": "#6E8B4F", "queue_gray": "#6B625A", "warn": "#C9A227", "zhu": "#A5342A" }
+  },
+  "asset_counts": {
+    "p0": ["baked_base_2496x1440（Artboard，見 grid.artboard_default；唔係 2688×1920）", "gov_compound_832x720", "drill_ring_784x536", "wall_seg_256x232 ×5 段（北／南西／南東／西／東，每段 4 tile）", "gate_256x360"],
+    "p1": ["house_130x100 ×3 款", "market_576x288", "shrine_288x288_h300", "clinic_288x288", "barrack_160x110", "stable_384x288", "storage_288x192", "barracks_288x192"],
+    "p2": ["tree ×3 款", "cherry_180x140", "pond_384x192", "flag_32x120"]
+  }
+}
