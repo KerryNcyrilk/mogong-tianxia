@@ -1,5 +1,12 @@
-import { COLS, ROWS, isCityLayer } from "./coords.ts"
-import type { CityLayer } from "./coords.ts"
+import { COLS, ROWS } from "./coords.ts"
+
+const LAYERS = ["ground", "road", "building", "overlay"] as const
+
+type CityLayer = (typeof LAYERS)[number]
+
+function isCityLayer(value: string): value is CityLayer {
+  return (LAYERS as readonly string[]).includes(value)
+}
 
 export const ZONE_ROLES = ["building", "reserve", "pending-gameplay"] as const
 
