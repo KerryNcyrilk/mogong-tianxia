@@ -1,5 +1,7 @@
 # combat-spec.v3.1 —— 戰鬥切片定案規格（ACCEPT）
 
+> 作廢，見 v4.0。現行準則為 docs/combat-spec.v4.0.md。
+
 > 版本：v3.1　｜　日期：2026-11-19　｜　作者：豆包（主設計＋主驗收）
 > 上游：`墨攻天下_復刻研究與設計規格.md` v2、`墨攻天下_戰鬥可玩切片簡報_v2對齊.md`、`combat-spec.v3.md`
 > 下游：Rowan 用 Cursor 實作
