@@ -22,14 +22,5 @@ export type {
   TilePoint,
   ZoneFootprint,
 } from "./coords.ts"
-export {
-  ZONE_ROLES,
-  checkCityLayout,
-  cityCheckPassed,
-  formatCityCheck,
-  loadCityLayout,
-  parseCityLayout,
-  rectInsideBoard,
-  rectsIntersect,
-} from "./zones.ts"
-export type { CityCheck, CityLayout, CityZone, ZoneRect, ZoneRole } from "./zones.ts"
+export { LAYERS, ZONE_KINDS, loadCityLayout, loadCityLayoutFile, parseCityLayout } from "./layout.ts"
+export type { CityGrid, CityLayer, CityLayout, CityMeta, CityZone, ZoneKind } from "./layout.ts"
