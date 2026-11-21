@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 import { MOCK_QUEUE, MOCK_RESOURCES, formatHMS, queueTitle } from "../src/ui/city/mock.ts"
-import { CAMERA, SAFE_RECT, SAFE_RECT_1920, artboardFrame } from "../src/ui/city/rects.ts"
+import { CAMERA, SAFE_RECT, SAFE_RECT_1920, overviewFrame } from "../src/ui/city/rects.ts"
 import { CAMERA_DEFAULT_ZOOM, STYLE, UI_1280, UI_1920 } from "../src/ui/city/tokens.ts"
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -63,7 +63,7 @@ MOCK_QUEUE.forEach((slot) => {
 })
 
 function frameMarkup(profile, label) {
-  const world = artboardFrame(CAMERA_DEFAULT_ZOOM, profile)
+  const world = overviewFrame(CAMERA_DEFAULT_ZOOM, profile)
   const panels = ["area_left", "area_chat", "area_actions", "area_queue"]
     .map((id) => profile.nodes.find((item) => item.id === id))
     .map(
@@ -81,7 +81,7 @@ function frameMarkup(profile, label) {
       return `<div class="node${valueClass}"${queueAttr} style="left:${node.x}px;top:${node.y}px;width:${node.w}px;height:${node.h}px;font-size:${font}px">${escapeHtml(text)}</div>`
     })
     .join("")
-  return `<section><h2>${escapeHtml(label)}</h2><div class="frame" style="width:${profile.screenW}px;height:${profile.screenH}px">${panels}<img alt="" src="../../public/art/board/city-placeholder.svg" style="left:${world.x}px;top:${world.y}px;width:${world.w}px;height:${world.h}px"/>${bits}</div></section>`
+  return `<section><h2>${escapeHtml(label)}</h2><div class="frame" style="width:${profile.screenW}px;height:${profile.screenH}px">${panels}<img alt="" src="../../public/art/board/iris-v1-town-overview.jpg" style="left:${world.x}px;top:${world.y}px;width:${world.w}px;height:${world.h}px"/>${bits}</div></section>`
 }
 
 const queueBoot = MOCK_QUEUE.map((slot) => ({

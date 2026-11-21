@@ -255,16 +255,13 @@ function importCount(files) {
 
 function combatLine(files) {
   const disabled = MOCK_COMBAT_ENTRIES.filter((entry) => entry.disabled && entry.note === "戰鬥系統待 B6")
-  const tsx = files
-    .filter((file) => file.endsWith(".tsx"))
-    .map((file) => readFileSync(file, "utf8"))
-    .join("\n")
-  const namesOk = ["校場", "點兵場", "競技"].every((name) => tsx.includes(name))
-  const phraseCount = tsx.split("戰鬥系統待 B6").length - 1
-  const disabledCount = (tsx.match(/\bdisabled\b/g) ?? []).length
+  const screen = readFileSync(resolve(cityDir, "CityScreen.tsx"), "utf8")
+  const bannersGone = !screen.includes("校場") && !screen.includes("點兵場")
+  const bottom = readFileSync(resolve(cityDir, "BottomBar.tsx"), "utf8")
+  const arenaFrozen = bottom.includes("競技") && bottom.includes("戰鬥系統待 B6") && bottom.includes("disabled={frozen}")
   const imports = importCount(files)
-  const pass = disabled.length === 3 && namesOk && phraseCount >= 3 && disabledCount >= 3 && imports === 0
-  return { pass, line: `combat-frozen: ${pass ? "PASS" : "FAIL"} (${disabled.length} entries disabled, imports ${imports})` }
+  const pass = disabled.length === 3 && bannersGone && arenaFrozen && imports === 0
+  return { pass, line: `combat-frozen: ${pass ? "PASS" : "FAIL"} (${disabled.length} entries disabled, banners removed, imports ${imports})` }
 }
 
 const files = walk(cityDir)

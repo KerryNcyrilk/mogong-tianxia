@@ -3,8 +3,9 @@ import { DEFAULT_FOCUS, clampFocusPoint, tileFocusPoint, worldToFocusTile } from
 import { zoneAabb, zoneToProjectedPolygon } from "../src/city/coords.ts"
 import { parseCityLayout } from "../src/city/layout.ts"
 import { fitDisplay } from "../src/ui/city/display.ts"
-import { SAFE_RECT, worldBoxToScreen } from "../src/ui/city/rects.ts"
-import { UI_1280 } from "../src/ui/city/tokens.ts"
+import { OVERVIEW_WORLD } from "../src/city/overview.ts"
+import { SAFE_RECT, overviewFrame, worldBoxToScreen } from "../src/ui/city/rects.ts"
+import { UI_1280, UI_1920 } from "../src/ui/city/tokens.ts"
 import { describe, expect, it } from "vitest"
 
 const layout = parseCityLayout(raw)
@@ -67,6 +68,21 @@ describe("iris v1 city", () => {
       expect(box.y + box.h).toBeGreaterThan(0)
       expect(box.y).toBeLessThan(650)
     }
+  })
+
+  it("fills the default viewport with the painted overview", () => {
+    const plate = overviewFrame(0.5, UI_1280)
+    expect(plate.x).toBeCloseTo(0)
+    expect(plate.y).toBeCloseTo(0)
+    expect(plate.w).toBeCloseTo(1280)
+    expect(plate.h).toBeCloseTo(720)
+    const wide = overviewFrame(0.5, UI_1920)
+    expect(wide.x).toBeCloseTo(0)
+    expect(wide.y).toBeCloseTo(0)
+    expect(wide.w).toBeCloseTo(1920)
+    expect(wide.h).toBeCloseTo(1080)
+    expect(OVERVIEW_WORLD.w).toBe(2560)
+    expect(OVERVIEW_WORLD.h).toBe(1440)
   })
 
   it("scales the HUD from the 1280×720 frame", () => {

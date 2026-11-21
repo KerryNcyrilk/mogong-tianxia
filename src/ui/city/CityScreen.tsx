@@ -4,11 +4,10 @@ import { BottomBar } from "./BottomBar.tsx"
 import { CornerButtons } from "./CornerButtons.tsx"
 import { fitDisplay, LOCKS, type LockSize } from "./display.ts"
 import { LeftPanel } from "./LeftPanel.tsx"
-import { FaceButton } from "./parts.tsx"
 import { MOCK_CHAT_SEED, MOCK_CHAT_TABS } from "./mock.ts"
-import { artboardFrame } from "./rects.ts"
+import { overviewFrame } from "./rects.ts"
 import { WorldLayer } from "./WorldLayer.tsx"
-import { CAMERA_ZOOMS, scale, STYLE, UI_1280, uiNode, type UiProfile } from "./tokens.ts"
+import { CAMERA_ZOOMS, scale, STYLE, UI_1280, type UiProfile } from "./tokens.ts"
 
 type ChatId = (typeof MOCK_CHAT_TABS)[number]["id"]
 type LockMode = LockSize | "fit"
@@ -119,9 +118,7 @@ export function CityScreen() {
 
   const fit = lock === "fit" ? fitDisplay(viewport.w, viewport.h) : fitDisplay(LOCKS[lock].w, LOCKS[lock].h)
   const profile: UiProfile = useMemo(() => (fit.scale === 1 ? UI_1280 : scale(UI_1280, fit.scale)), [fit.scale])
-  const frame = artboardFrame(zoom, profile, focus)
-  const drill = uiNode(profile, "combat_drill")
-  const muster = uiNode(profile, "combat_muster")
+  const frame = overviewFrame(zoom, profile, focus)
 
   function sendChat() {
     const text = drafts[chatTab].trim()
@@ -198,14 +195,6 @@ export function CityScreen() {
           color: STYLE.text,
         }}
       >
-        <FaceButton origin={{ x: 0, y: 0 }} face={drill} disabled stacked title="校場 戰鬥系統待 B6">
-          <span>校場</span>
-          <span>戰鬥系統待 B6</span>
-        </FaceButton>
-        <FaceButton origin={{ x: 0, y: 0 }} face={muster} disabled stacked title="點兵場 戰鬥系統待 B6">
-          <span>點兵場</span>
-          <span>戰鬥系統待 B6</span>
-        </FaceButton>
         <LeftPanel profile={profile} tab={tab} log={log} onTab={setTab} onAction={setLog} />
         <BottomBar
           profile={profile}

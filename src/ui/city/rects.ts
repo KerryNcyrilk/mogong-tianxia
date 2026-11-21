@@ -1,5 +1,6 @@
 import { ARTBOARD_H, ARTBOARD_W } from "../../city/coords.ts"
 import { DEFAULT_FOCUS, type WorldPoint } from "../../city/camera.ts"
+import { OVERVIEW_WORLD } from "../../city/overview.ts"
 import {
   ARTBOARD,
   CAMERA_DEFAULT_ZOOM,
@@ -67,6 +68,18 @@ export function artboardFrame(zoom: number, profile: UiProfile, focus: WorldPoin
     y: (0 - focus.y) * zoom * resScale + profile.camera.anchorY,
     w: ARTBOARD_W * zoom * resScale,
     h: ARTBOARD_H * zoom * resScale,
+  }
+}
+
+/** Painted overview, in HUD pixels. Same camera as artboardFrame; not a tile measurement. */
+export function overviewFrame(zoom: number, profile: UiProfile, focus: WorldPoint = DEFAULT_FOCUS): ScreenBox {
+  const resScale = resolutionScale(profile)
+  const scale = zoom * resScale
+  return {
+    x: (OVERVIEW_WORLD.x - focus.x) * scale + profile.camera.anchorX,
+    y: (OVERVIEW_WORLD.y - focus.y) * scale + profile.camera.anchorY,
+    w: OVERVIEW_WORLD.w * scale,
+    h: OVERVIEW_WORLD.h * scale,
   }
 }
 

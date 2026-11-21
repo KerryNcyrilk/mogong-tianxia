@@ -246,8 +246,6 @@ function baselineNodes(): UiNode[] {
     { id: "ring_explore_hit", label: "探險點擊", x: 1206, y: 50, w: 44, h: 44, group: "corner", hit: "ring" },
     { id: "ring_intel", label: "情報", x: 1208, y: 96, w: 40, h: 40, group: "corner", fontRole: "body", fontSize: 12 },
     { id: "ring_intel_hit", label: "情報點擊", x: 1206, y: 94, w: 44, h: 44, group: "corner", hit: "ring" },
-    { id: "combat_drill", label: "校場", x: 288, y: 16, w: 168, h: 36, group: "combat", fontRole: "body", fontSize: 12, hit: "control" },
-    { id: "combat_muster", label: "點兵場", x: 464, y: 16, w: 184, h: 36, group: "combat", fontRole: "body", fontSize: 12, hit: "control" },
     { id: "monarch_card", label: "君主卡", x: 0, y: 0, w: 276, h: 112, group: "left" },
     { id: "avatar", label: "頭像框", x: 12, y: 12, w: 72, h: 72, group: "left" },
     { id: "monarch_name", label: "君主名", x: 92, y: 12, w: 120, h: 26, group: "left", fontRole: "body", fontSize: 22 },
