@@ -1,43 +1,33 @@
 /**
- * Loader for data/cityLayout.json.
- * Field names stay as they are in the official file.
- * v1 role / builtin / campus / kebab-case ids are not accepted.
- * barrack (營房) and barracks (兵營) are different kinds.
+ * Loader for data/cityLayout.json (Iris v1, 28×24).
+ * The retired Doubao 28×20 file is not accepted.
+ * Zones carry id, name, footprint, and kind. layer/sprite are not required.
  */
-import { CELL, COLS, ROWS, TILE_H } from "./coords.ts"
+import { ARTBOARD_H, ARTBOARD_W, CELL, COLS, ORIGIN_X, ORIGIN_Y, PROJECTED_H, PROJECTED_W, ROWS, TILE_H } from "./coords.ts"
 
 const ID_PATTERN = /^[a-z0-9]+(_[a-z0-9]+)*$/
+const ZONE_COUNT = 37
 
-/** Closed set of layer values on the official file. */
-export const LAYERS = ["wall", "ground", "building", "deco"] as const
-
-export type CityLayer = (typeof LAYERS)[number]
-
-/**
- * Closed set of kind values that actually appear in data/cityLayout.json
- * (md5 e380c3abaea0e451008b2c03fcd5ae13). Do not merge barrack and barracks.
- */
+/** Closed set of kind values in the Iris v1 file. */
 export const ZONE_KINDS = [
-  "barrack",
-  "barracks",
   "cherry",
-  "clinic",
-  "dirt",
-  "drill_field",
+  "civic",
+  "drill",
   "farm",
   "gate",
   "gov",
-  "house",
-  "market",
+  "housing",
+  "military",
+  "mine",
   "plaza",
-  "road_main",
-  "road_minor",
-  "shrine",
-  "stable",
+  "pond",
+  "quarry",
+  "resource",
+  "road",
+  "special",
   "storage",
-  "tree",
   "wall",
-  "water",
+  "workshop",
 ] as const
 
 export type ZoneKind = (typeof ZONE_KINDS)[number]
@@ -49,10 +39,7 @@ export interface CityZone {
   y: number
   w: number
   h: number
-  layer: CityLayer
   kind: ZoneKind
-  sprite: string
-  count?: number
   note?: string
 }
 
@@ -63,6 +50,16 @@ export interface CityGrid {
   tile_h_px: number
   cols: number
   rows: number
+  artboardW: number
+  artboardH: number
+  originX: number
+  originY: number
+  planeW: number
+  planeH: number
+  focusTile: readonly [number, number]
+  zoom: number
+  zoomMin: number
+  zoomMax: number
 }
 
 export interface CityLayout {
@@ -79,16 +76,17 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
-function isCityLayer(value: string): value is CityLayer {
-  return (LAYERS as readonly string[]).includes(value)
-}
-
 function isZoneKind(value: string): value is ZoneKind {
   return (ZONE_KINDS as readonly string[]).includes(value)
 }
 
 function readInteger(value: unknown, label: string): number {
   if (typeof value !== "number" || !Number.isInteger(value)) fail(`${label} must be an integer`)
+  return value
+}
+
+function readNumber(value: unknown, label: string): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) fail(`${label} must be a finite number`)
   return value
 }
 
@@ -110,37 +108,20 @@ function readZone(value: unknown, index: number): CityZone {
   if (x < 0 || y < 0 || x + w > COLS || y + h > ROWS) {
     fail(`zone ${id}: footprint must lie inside ${COLS}×${ROWS}`)
   }
-  if (typeof value.layer !== "string" || !isCityLayer(value.layer)) {
-    fail(`zone ${id}: layer must be wall, ground, building, or deco`)
-  }
   if (typeof value.kind !== "string" || !isZoneKind(value.kind)) {
     fail(`zone ${id}: kind must be one of ${ZONE_KINDS.join(" ")}`)
   }
-  if (typeof value.sprite !== "string" || value.sprite.trim() === "") {
-    fail(`zone ${id}: sprite must be a non-empty string`)
-  }
-  const zone: CityZone = {
-    id,
-    name: value.name,
-    x,
-    y,
-    w,
-    h,
-    layer: value.layer,
-    kind: value.kind,
-    sprite: value.sprite,
-  }
-  if ("count" in value && value.count !== undefined) {
-    if (typeof value.count !== "number" || !Number.isInteger(value.count) || value.count < 1) {
-      fail(`zone ${id}: count must be a positive integer`)
-    }
-    zone.count = value.count
-  }
+  const zone: CityZone = { id, name: value.name, x, y, w, h, kind: value.kind }
   if ("note" in value && value.note !== undefined) {
     if (typeof value.note !== "string") fail(`zone ${id}: note must be a string`)
     zone.note = value.note
   }
   return zone
+}
+
+function readPair(value: unknown, label: string): readonly [number, number] {
+  if (!Array.isArray(value) || value.length !== 2) fail(`${label} must be a pair`)
+  return [readInteger(value[0], `${label}[0]`), readInteger(value[1], `${label}[1]`)]
 }
 
 function readGrid(value: unknown): CityGrid {
@@ -154,13 +135,60 @@ function readGrid(value: unknown): CityGrid {
       `grid must be tile_px=${CELL} tile_h_px=${TILE_H} cols=${COLS} rows=${ROWS}, got ${tile_px} ${tile_h_px} ${cols} ${rows}`,
     )
   }
-  return { ...value, tile_px, tile_h_px, cols, rows }
+  if (!isRecord(value.artboard_default)) fail("grid.artboard_default must be an object")
+  const artboard = value.artboard_default
+  const artboardW = readInteger(artboard.width, "artboard.width")
+  const artboardH = readInteger(artboard.height, "artboard.height")
+  if (!isRecord(artboard.projected_plane)) fail("artboard.projected_plane must be an object")
+  const planeW = readInteger(artboard.projected_plane.width, "projected_plane.width")
+  const planeH = readInteger(artboard.projected_plane.height, "projected_plane.height")
+  if (!isRecord(artboard.origin)) fail("artboard.origin must be an object")
+  const originX = readInteger(artboard.origin.OX, "origin.OX")
+  const originY = readInteger(artboard.origin.OY, "origin.OY")
+  if (
+    artboardW !== ARTBOARD_W ||
+    artboardH !== ARTBOARD_H ||
+    planeW !== PROJECTED_W ||
+    planeH !== PROJECTED_H ||
+    originX !== ORIGIN_X ||
+    originY !== ORIGIN_Y
+  ) {
+    fail(
+      `artboard must be ${ARTBOARD_W}×${ARTBOARD_H}, plane ${PROJECTED_W}×${PROJECTED_H}, origin ${ORIGIN_X},${ORIGIN_Y}`,
+    )
+  }
+  if (!isRecord(value.camera_default)) fail("grid.camera_default must be an object")
+  const camera = value.camera_default
+  const focusTile = readPair(camera.focus_tile, "camera.focus_tile")
+  const zoom = readNumber(camera.zoom, "camera.zoom")
+  if (!Array.isArray(camera.zoom_range) || camera.zoom_range.length !== 2) fail("camera.zoom_range must be a pair")
+  const zoomMin = readNumber(camera.zoom_range[0], "camera.zoom_range[0]")
+  const zoomMax = readNumber(camera.zoom_range[1], "camera.zoom_range[1]")
+  if (focusTile[0] !== 14 || focusTile[1] !== 13 || zoom !== 0.5 || zoomMin !== 0.4 || zoomMax !== 1.2) {
+    fail("camera must focus tile [14, 13] at zoom 0.5 with range 0.4–1.2")
+  }
+  return {
+    tile_px,
+    tile_h_px,
+    cols,
+    rows,
+    artboardW,
+    artboardH,
+    originX,
+    originY,
+    planeW,
+    planeH,
+    focusTile,
+    zoom,
+    zoomMin,
+    zoomMax,
+  }
 }
 
 export function parseCityLayout(input: unknown): CityLayout {
   if (!isRecord(input)) fail("root must be an object")
   if (!Array.isArray(input.zones)) fail("zones must be an array")
-  if (input.zones.length !== 31) fail(`zones length must be 31, got ${input.zones.length}`)
+  if (input.zones.length !== ZONE_COUNT) fail(`zones length must be ${ZONE_COUNT}, got ${input.zones.length}`)
   const zones = input.zones.map((zone, index) => readZone(zone, index))
   const seen = new Set<string>()
   for (const zone of zones) {
@@ -168,6 +196,7 @@ export function parseCityLayout(input: unknown): CityLayout {
     seen.add(zone.id)
   }
   if (!isRecord(input.meta)) fail("meta must be an object")
+  if (input.meta.version !== "iris-v1") fail("meta.version must be iris-v1")
   return { meta: input.meta, grid: readGrid(input.grid), zones }
 }
 

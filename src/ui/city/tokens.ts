@@ -1,7 +1,10 @@
 /**
  * 1280×720 baseline. 1920×1080 is scale(UI_1280, 1.5), never a second hand-written set.
  * Zoom steps stay outside this tree so they are not multiplied.
+ * The camera anchor is the safe-rect center and does scale with the HUD.
+ * The focus tile lives in src/city/camera.ts so it is not multiplied.
  */
+import { ARTBOARD_H, ARTBOARD_W, ORIGIN_X, ORIGIN_Y } from "../../city/coords.ts"
 
 export interface UiNode {
   id: string
@@ -20,7 +23,7 @@ export interface UiProfile {
   screenW: number
   screenH: number
   safe: { x: number; y: number; w: number; h: number }
-  camera: { offsetX: number; offsetY: number }
+  camera: { anchorX: number; anchorY: number }
   borderOuter: number
   borderInner: number
   nodes: UiNode[]
@@ -38,15 +41,15 @@ export const STYLE = {
   queued: "#6B625A",
   complete: "#C9A227",
   cinnabar: "#A5342A",
-  grass: "#55603F",
+  grass: "#A09B60",
   fontTitle: '"Noto Serif SC", "Source Han Serif", SimSun, serif',
   fontValue: '"Noto Sans SC", "Microsoft YaHei", sans-serif',
 } as const
 
 export const CAMERA_ZOOMS = [0.4, 0.5, 1.0, 1.2] as const
 export const CAMERA_DEFAULT_ZOOM = 0.5
-export const ARTBOARD = { w: 2496, h: 1440 } as const
-export const ART_ORIGIN = { x: 1056, y: 192 } as const
+export const ARTBOARD = { w: ARTBOARD_W, h: ARTBOARD_H } as const
+export const ART_ORIGIN = { x: ORIGIN_X, y: ORIGIN_Y } as const
 
 const RESOURCE_ROWS = [
   ["res_pop", "人口"],
@@ -280,7 +283,7 @@ export const UI_1280: UiProfile = {
   screenW: 1280,
   screenH: 720,
   safe: { x: 276, y: 0, w: 1004, h: 650 },
-  camera: { offsetX: 96, offsetY: 0 },
+  camera: { anchorX: 778, anchorY: 325 },
   borderOuter: 2,
   borderInner: 1,
   nodes: baselineNodes(),

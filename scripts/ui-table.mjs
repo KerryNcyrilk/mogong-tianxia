@@ -35,7 +35,7 @@ const markdown = [
   "由 `scripts/ui-table.mjs` 自 `src/ui/city/tokens.ts` 生成。1920 欄是 `scale(UI_1280, 1.5)`，沒有第二套手寫數字。",
   "",
   `安全區 1280：(${SAFE_RECT.x},${SAFE_RECT.y},${SAFE_RECT.w},${SAFE_RECT.h})；1920：(${SAFE_RECT_1920.x},${SAFE_RECT_1920.y},${SAFE_RECT_1920.w},${SAFE_RECT_1920.h})。`,
-  `相機 offset 1280：(${CAMERA.offset.x},${CAMERA.offset.y})；1920：(${CAMERA.offset1920.x},${CAMERA.offset1920.y})。預設 zoom ${CAMERA.zoom}。`,
+  `鏡頭對準 tile (14,13)，錨在安全區中心。1280 anchor (${CAMERA.anchor.x},${CAMERA.anchor.y})；1920 anchor (${CAMERA.anchor1920.x},${CAMERA.anchor1920.y})。預設 zoom ${CAMERA.zoom}。世界 zoom 不移動 UI。`,
   "",
   "| id | 名稱 | 群組 | 1280 x | 1280 y | 1280 w | 1280 h | 1920 x | 1920 y | 1920 w | 1920 h |",
   "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",

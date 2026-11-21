@@ -5,7 +5,7 @@ export interface MockResource {
   name: string
   value: string
   yieldText: string
-  format: "cap" | "int" | "pair"
+  format: "int" | "pair"
 }
 
 export interface MockQueueSlot {
@@ -28,32 +28,33 @@ export const MOCK_LORD = {
   prestige: "1280",
   peerage: "亭侯",
   alliance: "墨門",
-  city: "墨城",
+  city: "邊城",
 } as const
 
 export const MOCK_GENERAL = {
-  name: "MOCK_墨翟",
-  stat: "MOCK_攻 42 防 36",
+  name: "承意",
+  stat: "Lv.12",
 } as const
 
+/** Illustrative figures. 人口 is a single value; the four stocks are current/cap. */
 export const MOCK_RESOURCES: readonly MockResource[] = [
-  { id: "res_pop", name: "人口", value: "320/500", yieldText: "+12/時", format: "cap" },
+  { id: "res_pop", name: "人口", value: "330", yieldText: "+12/時", format: "int" },
   { id: "res_jade", name: "玉石", value: "112", yieldText: "+1/時", format: "int" },
-  { id: "res_coin", name: "刀幣", value: "245608", yieldText: "+360/時", format: "int" },
+  { id: "res_coin", name: "刀幣", value: "245600", yieldText: "+360/時", format: "int" },
   { id: "res_food", name: "糧食", value: "51298/63002", yieldText: "+480/時", format: "pair" },
-  { id: "res_wood", name: "木材", value: "51298/63002", yieldText: "+480/時", format: "pair" },
-  { id: "res_iron", name: "生鐵", value: "51298/63002", yieldText: "+240/時", format: "pair" },
-  { id: "res_stone", name: "石頭", value: "51298/63002", yieldText: "+240/時", format: "pair" },
+  { id: "res_wood", name: "木材", value: "8420/9000", yieldText: "+480/時", format: "pair" },
+  { id: "res_iron", name: "生鐵", value: "3120/4500", yieldText: "+240/時", format: "pair" },
+  { id: "res_stone", name: "石頭", value: "980/1300", yieldText: "+240/時", format: "pair" },
 ]
 
 export const MOCK_TROOPS = [
-  { name: "刀兵", count: "MOCK_1200" },
-  { name: "戟兵", count: "MOCK_800" },
-  { name: "弓兵", count: "MOCK_960" },
-  { name: "盾兵", count: "MOCK_640" },
-  { name: "騎兵", count: "MOCK_320" },
-  { name: "學者", count: "MOCK_40" },
-  { name: "神獸", count: "MOCK_1" },
+  { name: "刀兵", count: "120" },
+  { name: "戟兵", count: "64" },
+  { name: "弓兵", count: "80" },
+  { name: "盾兵", count: "48" },
+  { name: "騎兵", count: "32" },
+  { name: "學者", count: "8" },
+  { name: "神獸", count: "1" },
 ] as const
 
 /** Two building rows and one queued row. Third name and the non-example timers are assumed. */
