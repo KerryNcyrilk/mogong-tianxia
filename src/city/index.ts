@@ -1,8 +1,12 @@
 export {
+  ARTBOARD_H,
+  ARTBOARD_W,
   CELL,
   COLS,
   LOGICAL_H,
   LOGICAL_W,
+  ORIGIN_X,
+  ORIGIN_Y,
   PROJECTED_H,
   PROJECTED_ORIGIN,
   PROJECTED_W,
@@ -12,6 +16,7 @@ export {
   inBounds,
   logicalToTile,
   tileToLogical,
+  zoneAabb,
   zoneToProjectedPolygon,
 } from "./coords.ts"
 export type {
@@ -19,8 +24,9 @@ export type {
   ProjectedOrigin,
   ProjectedPoint,
   ProjectedPolygon,
+  ScreenBox,
   TilePoint,
   ZoneFootprint,
 } from "./coords.ts"
-export { LAYERS, ZONE_KINDS, loadCityLayout, parseCityLayout } from "./layout.ts"
-export type { CityGrid, CityLayer, CityLayout, CityMeta, CityZone, ZoneKind } from "./layout.ts"
+export { ZONE_KINDS, loadCityLayout, parseCityLayout } from "./layout.ts"
+export type { CityGrid, CityLayout, CityMeta, CityZone, ZoneKind } from "./layout.ts"

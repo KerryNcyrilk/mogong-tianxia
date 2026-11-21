@@ -1,5 +1,7 @@
 # B4 ASSUMED
 
+> 這是 B4 當時的假設紀錄。2026-11-21 起主城座標改為 Iris v1（`data/cityLayout.json`，28×24）。下面的 28×20 artboard、舊 offset 與舊 md5 都不再是座標權威。
+
 這些是工作包沒有寫死、實作時自行決定的點。
 
 1. 世界層用 CSS 定位現有 `public/art/board/city-placeholder.svg`，沒有接 pixi。佔位圖本身已是 2496×1440，縮放用畫面座標就滿足 G6。

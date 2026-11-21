@@ -1,21 +1,27 @@
 /**
  * Logical tiles are square. The projected diamond is 2:1.
+ * Iris v1 authority: 28×24, artboard 2688×1536.
+ * North tip of tile (x,y): sx=(x-y)×48+1200, sy=(x+y)×24+192.
+ * Screen y grows south, so a camera on this plane looks from south toward north.
  * TILE_H is the diamond height, not the logical row pitch.
- * Logical y is row * CELL. Do not use row * TILE_H as a row pitch.
  */
 
 export const CELL = 96
 export const TILE_W = 96
 export const TILE_H = 48
 export const COLS = 28
-export const ROWS = 20
+export const ROWS = 24
 export const LOGICAL_W = 2688
-export const LOGICAL_H = 1920
-export const PROJECTED_W = 2304
-export const PROJECTED_H = 1152
+export const LOGICAL_H = 2304
+export const PROJECTED_W = 2496
+export const PROJECTED_H = 1248
+export const ARTBOARD_W = 2688
+export const ARTBOARD_H = 1536
+export const ORIGIN_X = 1200
+export const ORIGIN_Y = 192
 
-/** 960 = ROWS * 48, so the leftmost projected point of the 28×20 plane sits at x = 0. */
-export const PROJECTED_ORIGIN = { x: 960, y: 0 } as const
+/** Artboard origin. The retired 28×20 plane used (960, 0) and is not authoritative. */
+export const PROJECTED_ORIGIN = { x: ORIGIN_X, y: ORIGIN_Y } as const
 
 if (LOGICAL_W !== COLS * CELL || LOGICAL_H !== ROWS * CELL) {
   throw new Error("logical board size must be COLS*CELL by ROWS*CELL")
@@ -29,8 +35,19 @@ if (PROJECTED_W !== (COLS + ROWS) * 48 || PROJECTED_H !== (COLS + ROWS) * 24) {
   throw new Error("projected plane must be (COLS+ROWS)*48 by (COLS+ROWS)*24")
 }
 
-if (PROJECTED_ORIGIN.x !== ROWS * 48 || PROJECTED_ORIGIN.y !== 0) {
-  throw new Error("default projected origin must put the leftmost point at 0")
+if (PROJECTED_ORIGIN.x !== 1200 || PROJECTED_ORIGIN.y !== 192) {
+  throw new Error("Iris v1 projected origin must be (1200, 192)")
+}
+
+if (ARTBOARD_W !== 2688 || ARTBOARD_H !== 1536) {
+  throw new Error("Iris v1 artboard must be 2688×1536")
+}
+
+const planeLeft = (0 - ROWS) * 48 + ORIGIN_X
+const planeRight = COLS * 48 + ORIGIN_X
+const planeBottom = (COLS + ROWS) * 24 + ORIGIN_Y
+if (planeLeft < 0 || ORIGIN_Y < 0 || planeRight > ARTBOARD_W || planeBottom > ARTBOARD_H) {
+  throw new Error("projected plane must sit inside the artboard")
 }
 
 export interface TilePoint {
@@ -60,7 +77,14 @@ export interface ZoneFootprint {
   h: number
 }
 
-/** Clockwise diamond: top, right, bottom, left. */
+export interface ScreenBox {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+/** Clockwise diamond: top (north), right, bottom (south), left. */
 export type ProjectedPolygon = readonly [ProjectedPoint, ProjectedPoint, ProjectedPoint, ProjectedPoint]
 
 function assertInteger(value: number, label: string): void {
@@ -88,11 +112,10 @@ export function logicalToTile(x: number, y: number): TilePoint {
 
 /**
  * 2:1 diamond of a logical footprint.
- * Default origin is the 2304×1152 plane (960, 0):
- * left = (x-(y+h))*48+960, top = (x+y)*24,
- * right = (x+w-y)*48+960, bottom = (x+w+y+h)*24.
- * Pass another origin (the 2496×1440 artboard uses 1056, 192) instead of a second formula.
- * width = (w+h)*48, height = (w+h)*24.
+ * Default origin is the Iris artboard (1200, 192):
+ * north = (x-y)×48+1200, (x+y)×24+192.
+ * width = (w+h)×48, height = (w+h)×24.
+ * The south vertex is the sprite foot-anchor.
  */
 export function zoneToProjectedPolygon(
   zone: ZoneFootprint,
@@ -112,4 +135,14 @@ export function zoneToProjectedPolygon(
   const bottom = { x: (x + w - (y + h)) * 48 + ox, y: (x + w + y + h) * 24 + oy }
   const left = { x: (x - (y + h)) * 48 + ox, y: (x + y + h) * 24 + oy }
   return [top, right, bottom, left]
+}
+
+/** Axis-aligned bounds of a footprint diamond on the artboard. */
+export function zoneAabb(zone: ZoneFootprint, origin: ProjectedOrigin = PROJECTED_ORIGIN): ScreenBox {
+  const polygon = zoneToProjectedPolygon(zone, origin)
+  const xs = polygon.map((point) => point.x)
+  const ys = polygon.map((point) => point.y)
+  const x = Math.min(...xs)
+  const y = Math.min(...ys)
+  return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y }
 }

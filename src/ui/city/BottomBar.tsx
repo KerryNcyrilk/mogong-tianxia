@@ -76,6 +76,7 @@ export function BottomBar({
               border: 0,
               outline: "none",
               padding: "0 8px",
+              userSelect: "text",
             }}
           />
           <FaceButton

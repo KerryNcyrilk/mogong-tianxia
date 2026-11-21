@@ -1,19 +1,11 @@
 import { readdirSync, readFileSync, statSync } from "node:fs"
 import { dirname, join, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
-import { zoneToProjectedPolygon } from "../src/city/coords.ts"
+import { zoneAabb } from "../src/city/coords.ts"
 import { loadCityLayoutFile } from "../src/city/layout.node.ts"
 import { MOCK_COMBAT_ENTRIES, MOCK_QUEUE, MOCK_RESOURCES, formatHMS, queueTitle } from "../src/ui/city/mock.ts"
 import { AREA_IDS, SUBJECT_IDS, layoutAt, worldBoxToScreen } from "../src/ui/city/rects.ts"
-import {
-  ART_ORIGIN,
-  CAMERA_DEFAULT_ZOOM,
-  CAMERA_ZOOMS,
-  STYLE,
-  UI_1280,
-  UI_1920,
-  scale,
-} from "../src/ui/city/tokens.ts"
+import { CAMERA_DEFAULT_ZOOM, CAMERA_ZOOMS, STYLE, UI_1280, UI_1920, scale } from "../src/ui/city/tokens.ts"
 
 const here = dirname(fileURLToPath(import.meta.url))
 const cityDir = resolve(here, "../src/ui/city")
@@ -28,7 +20,7 @@ const ALLOWED_HEX = new Set([
   "#6B625A",
   "#C9A227",
   "#A5342A",
-  "#55603F",
+  "#A09B60",
 ])
 
 function nodeById(profile, id) {
@@ -76,15 +68,6 @@ function contains(outer, inner) {
   )
 }
 
-function zoneAabb(zone) {
-  const polygon = zoneToProjectedPolygon(zone, ART_ORIGIN)
-  const xs = polygon.map((point) => point.x)
-  const ys = polygon.map((point) => point.y)
-  const x = Math.min(...xs)
-  const y = Math.min(...ys)
-  return { x, y, w: Math.max(...xs) - x, h: Math.max(...ys) - y }
-}
-
 function areasLine() {
   const areas = AREA_IDS.map((id) => nodeById(UI_1280, id))
   const widths = areas.map((area) => area.w)
@@ -120,8 +103,8 @@ function sourceIssues(files) {
 function contentIssues() {
   const issues = []
   const names = ["人口", "玉石", "刀幣", "糧食", "木材", "生鐵", "石頭"]
-  const values = ["320/500", "112", "245608", "51298/63002", "51298/63002", "51298/63002", "51298/63002"]
-  const formats = ["cap", "int", "int", "pair", "pair", "pair", "pair"]
+  const values = ["330", "112", "245600", "51298/63002", "8420/9000", "3120/4500", "980/1300"]
+  const formats = ["int", "int", "int", "pair", "pair", "pair", "pair"]
   if (MOCK_RESOURCES.length !== 7) issues.push("resource count")
   MOCK_RESOURCES.forEach((resource, index) => {
     if (resource.name !== names[index] || resource.value !== values[index] || resource.format !== formats[index]) {
@@ -171,7 +154,7 @@ function scaleLine() {
   pass &&= queue.x === 1683 && queue.y === 975 && queue.w === 237 && queue.h === 105
   pass &&= UI_1920.safe.x === 414 && UI_1920.safe.y === 0 && UI_1920.safe.x + UI_1920.safe.w === 1920
   pass &&= UI_1920.safe.h === 975 && UI_1920.safe.y + UI_1920.safe.h === 975
-  pass &&= UI_1920.camera.offsetX === 144 && UI_1920.camera.offsetY === 0
+  pass &&= UI_1920.camera.anchorX === 1167 && UI_1920.camera.anchorY === 487.5
   return { pass, line: `scale: ${pass ? "PASS" : "FAIL"} (${base.length} values, 1920 = 1280*1.5)` }
 }
 
@@ -208,6 +191,25 @@ function cameraLine() {
   const moved = CAMERA_ZOOMS.map((zoom) => JSON.stringify(worldBoxToScreen(zoneAabb(drill), zoom, UI_1280)))
   if (new Set(moved).size !== CAMERA_ZOOMS.length) pass = false
   return { pass, line: `camera: ${pass ? "PASS" : "FAIL"} (${CAMERA_ZOOMS.length} zooms, ui fixed)` }
+}
+
+function framingLine() {
+  const layout = loadCityLayoutFile()
+  const view = { x: 0, y: 0, w: UI_1280.screenW, h: UI_1280.screenH }
+  const boxOf = (id) => {
+    const zone = layout.zones.find((item) => item.id === id)
+    if (!zone) throw new Error(`missing zone ${id}`)
+    return worldBoxToScreen(zoneAabb(zone), 0.4, UI_1280)
+  }
+  const need = ["wall_n", "wall_e", "wall_w", "wall_s_e", "wall_s_w", "gate_s", "forest", "iron_mine", "farm", "quarry", "beacon"]
+  const missed = need.filter((id) => overlapArea(boxOf(id), view) <= 0 || overlapArea(boxOf(id), UI_1280.safe) <= 0)
+  const gate = boxOf("gate_s")
+  const north = boxOf("wall_n")
+  const leftBiased = gate.x + gate.w / 2 < UI_1280.screenW / 2
+  const facingNorth = gate.y + gate.h / 2 > north.y + north.h / 2
+  const pass = missed.length === 0 && leftBiased && facingNorth
+  if (!pass) console.error(`framing missed=${missed.join(",") || "-"} left=${leftBiased} north=${facingNorth}`)
+  return { pass, line: `framing: ${pass ? "PASS" : "FAIL"} (zoom 0.4 walls, belt, left gate, facing north)` }
 }
 
 function typographyLine() {
@@ -253,19 +255,16 @@ function importCount(files) {
 
 function combatLine(files) {
   const disabled = MOCK_COMBAT_ENTRIES.filter((entry) => entry.disabled && entry.note === "戰鬥系統待 B6")
-  const tsx = files
-    .filter((file) => file.endsWith(".tsx"))
-    .map((file) => readFileSync(file, "utf8"))
-    .join("\n")
-  const namesOk = ["校場", "點兵場", "競技"].every((name) => tsx.includes(name))
-  const phraseCount = tsx.split("戰鬥系統待 B6").length - 1
-  const disabledCount = (tsx.match(/\bdisabled\b/g) ?? []).length
+  const screen = readFileSync(resolve(cityDir, "CityScreen.tsx"), "utf8")
+  const bannersGone = !screen.includes("校場") && !screen.includes("點兵場")
+  const bottom = readFileSync(resolve(cityDir, "BottomBar.tsx"), "utf8")
+  const arenaFrozen = bottom.includes("競技") && bottom.includes("戰鬥系統待 B6") && bottom.includes("disabled={frozen}")
   const imports = importCount(files)
-  const pass = disabled.length === 3 && namesOk && phraseCount >= 3 && disabledCount >= 3 && imports === 0
-  return { pass, line: `combat-frozen: ${pass ? "PASS" : "FAIL"} (${disabled.length} entries disabled, imports ${imports})` }
+  const pass = disabled.length === 3 && bannersGone && arenaFrozen && imports === 0
+  return { pass, line: `combat-frozen: ${pass ? "PASS" : "FAIL"} (${disabled.length} entries disabled, banners removed, imports ${imports})` }
 }
 
 const files = walk(cityDir)
-const lines = [areasLine(), styleLine(files), scaleLine(), safeLine(), cameraLine(), typographyLine(), combatLine(files)]
+const lines = [areasLine(), styleLine(files), scaleLine(), safeLine(), cameraLine(), framingLine(), typographyLine(), combatLine(files)]
 process.stdout.write(`${lines.map((item) => item.line).join("\n")}\n`)
 process.exit(lines.every((item) => item.pass) ? 0 : 1)

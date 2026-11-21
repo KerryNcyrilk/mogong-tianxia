@@ -1,3 +1,6 @@
+import { ARTBOARD_H, ARTBOARD_W } from "../../city/coords.ts"
+import { DEFAULT_FOCUS, type WorldPoint } from "../../city/camera.ts"
+import { OVERVIEW_WORLD } from "../../city/overview.ts"
 import {
   ARTBOARD,
   CAMERA_DEFAULT_ZOOM,
@@ -27,8 +30,9 @@ export const SAFE_RECT_1920: ScreenBox = UI_1920.safe
 export const CAMERA = {
   zooms: CAMERA_ZOOMS,
   zoom: CAMERA_DEFAULT_ZOOM,
-  offset: { x: UI_1280.camera.offsetX, y: UI_1280.camera.offsetY },
-  offset1920: { x: UI_1920.camera.offsetX, y: UI_1920.camera.offsetY },
+  focus: DEFAULT_FOCUS,
+  anchor: { x: UI_1280.camera.anchorX, y: UI_1280.camera.anchorY },
+  anchor1920: { x: UI_1920.camera.anchorX, y: UI_1920.camera.anchorY },
 } as const
 
 export function profileOf(size: 1280 | 1920): UiProfile {
@@ -48,23 +52,48 @@ export function resolutionScale(profile: UiProfile): number {
   return profile.screenW / UI_1280.screenW
 }
 
-/** World layer frame. 1920 multiplies zoom by the 1.5 screen scale so the composition matches. */
-export function artboardFrame(zoom: number, profile: UiProfile): ScreenBox {
+if (ARTBOARD.w !== ARTBOARD_W || ARTBOARD.h !== ARTBOARD_H) {
+  throw new Error("UI artboard must match the Iris v1 artboard")
+}
+
+/**
+ * World layer frame relative to the HUD origin.
+ * The focus tile stays on the safe-rect center while zoom changes.
+ * 1920 multiplies zoom by the 1.5 screen scale so the composition matches.
+ */
+export function artboardFrame(zoom: number, profile: UiProfile, focus: WorldPoint = DEFAULT_FOCUS): ScreenBox {
   const resScale = resolutionScale(profile)
   return {
-    x: profile.camera.offsetX,
-    y: profile.camera.offsetY,
-    w: ARTBOARD.w * zoom * resScale,
-    h: ARTBOARD.h * zoom * resScale,
+    x: (0 - focus.x) * zoom * resScale + profile.camera.anchorX,
+    y: (0 - focus.y) * zoom * resScale + profile.camera.anchorY,
+    w: ARTBOARD_W * zoom * resScale,
+    h: ARTBOARD_H * zoom * resScale,
   }
 }
 
-/** Artboard pixel box → screen pixel box. Same formula as artboardFrame. */
-export function worldBoxToScreen(box: ScreenBox, zoom: number, profile: UiProfile): ScreenBox {
+/** Painted overview, in HUD pixels. Same camera as artboardFrame; not a tile measurement. */
+export function overviewFrame(zoom: number, profile: UiProfile, focus: WorldPoint = DEFAULT_FOCUS): ScreenBox {
+  const resScale = resolutionScale(profile)
+  const scale = zoom * resScale
+  return {
+    x: (OVERVIEW_WORLD.x - focus.x) * scale + profile.camera.anchorX,
+    y: (OVERVIEW_WORLD.y - focus.y) * scale + profile.camera.anchorY,
+    w: OVERVIEW_WORLD.w * scale,
+    h: OVERVIEW_WORLD.h * scale,
+  }
+}
+
+/** Artboard pixel box → HUD pixel box. Same formula as artboardFrame. */
+export function worldBoxToScreen(
+  box: ScreenBox,
+  zoom: number,
+  profile: UiProfile,
+  focus: WorldPoint = DEFAULT_FOCUS,
+): ScreenBox {
   const resScale = resolutionScale(profile)
   return {
-    x: box.x * zoom * resScale + profile.camera.offsetX,
-    y: box.y * zoom * resScale + profile.camera.offsetY,
+    x: (box.x - focus.x) * zoom * resScale + profile.camera.anchorX,
+    y: (box.y - focus.y) * zoom * resScale + profile.camera.anchorY,
     w: box.w * zoom * resScale,
     h: box.h * zoom * resScale,
   }

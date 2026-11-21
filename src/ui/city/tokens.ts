@@ -1,7 +1,10 @@
 /**
  * 1280×720 baseline. 1920×1080 is scale(UI_1280, 1.5), never a second hand-written set.
  * Zoom steps stay outside this tree so they are not multiplied.
+ * The camera anchor is the safe-rect center and does scale with the HUD.
+ * The focus tile lives in src/city/camera.ts so it is not multiplied.
  */
+import { ARTBOARD_H, ARTBOARD_W, ORIGIN_X, ORIGIN_Y } from "../../city/coords.ts"
 
 export interface UiNode {
   id: string
@@ -20,7 +23,7 @@ export interface UiProfile {
   screenW: number
   screenH: number
   safe: { x: number; y: number; w: number; h: number }
-  camera: { offsetX: number; offsetY: number }
+  camera: { anchorX: number; anchorY: number }
   borderOuter: number
   borderInner: number
   nodes: UiNode[]
@@ -38,15 +41,15 @@ export const STYLE = {
   queued: "#6B625A",
   complete: "#C9A227",
   cinnabar: "#A5342A",
-  grass: "#55603F",
+  grass: "#A09B60",
   fontTitle: '"Noto Serif SC", "Source Han Serif", SimSun, serif',
   fontValue: '"Noto Sans SC", "Microsoft YaHei", sans-serif',
 } as const
 
 export const CAMERA_ZOOMS = [0.4, 0.5, 1.0, 1.2] as const
 export const CAMERA_DEFAULT_ZOOM = 0.5
-export const ARTBOARD = { w: 2496, h: 1440 } as const
-export const ART_ORIGIN = { x: 1056, y: 192 } as const
+export const ARTBOARD = { w: ARTBOARD_W, h: ARTBOARD_H } as const
+export const ART_ORIGIN = { x: ORIGIN_X, y: ORIGIN_Y } as const
 
 const RESOURCE_ROWS = [
   ["res_pop", "人口"],
@@ -243,8 +246,6 @@ function baselineNodes(): UiNode[] {
     { id: "ring_explore_hit", label: "探險點擊", x: 1206, y: 50, w: 44, h: 44, group: "corner", hit: "ring" },
     { id: "ring_intel", label: "情報", x: 1208, y: 96, w: 40, h: 40, group: "corner", fontRole: "body", fontSize: 12 },
     { id: "ring_intel_hit", label: "情報點擊", x: 1206, y: 94, w: 44, h: 44, group: "corner", hit: "ring" },
-    { id: "combat_drill", label: "校場", x: 288, y: 16, w: 168, h: 36, group: "combat", fontRole: "body", fontSize: 12, hit: "control" },
-    { id: "combat_muster", label: "點兵場", x: 464, y: 16, w: 184, h: 36, group: "combat", fontRole: "body", fontSize: 12, hit: "control" },
     { id: "monarch_card", label: "君主卡", x: 0, y: 0, w: 276, h: 112, group: "left" },
     { id: "avatar", label: "頭像框", x: 12, y: 12, w: 72, h: 72, group: "left" },
     { id: "monarch_name", label: "君主名", x: 92, y: 12, w: 120, h: 26, group: "left", fontRole: "body", fontSize: 22 },
@@ -280,7 +281,7 @@ export const UI_1280: UiProfile = {
   screenW: 1280,
   screenH: 720,
   safe: { x: 276, y: 0, w: 1004, h: 650 },
-  camera: { offsetX: 96, offsetY: 0 },
+  camera: { anchorX: 778, anchorY: 325 },
   borderOuter: 2,
   borderInner: 1,
   nodes: baselineNodes(),

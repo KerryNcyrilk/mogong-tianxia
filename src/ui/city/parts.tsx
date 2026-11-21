@@ -24,6 +24,7 @@ export function Panel({
         color: STYLE.text,
         overflow: "hidden",
         zIndex: 1,
+        pointerEvents: "auto",
       }}
     >
       {children}
@@ -104,6 +105,7 @@ export function FaceButton({
         color,
         cursor: disabled ? "not-allowed" : "pointer",
         zIndex: 2,
+        pointerEvents: "auto",
       }}
     >
       <span className="city-face" style={faceStyle}>

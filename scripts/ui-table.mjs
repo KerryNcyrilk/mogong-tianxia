@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "node:fs"
 import { dirname, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 import { MOCK_QUEUE, MOCK_RESOURCES, formatHMS, queueTitle } from "../src/ui/city/mock.ts"
-import { CAMERA, SAFE_RECT, SAFE_RECT_1920, artboardFrame } from "../src/ui/city/rects.ts"
+import { CAMERA, SAFE_RECT, SAFE_RECT_1920, overviewFrame } from "../src/ui/city/rects.ts"
 import { CAMERA_DEFAULT_ZOOM, STYLE, UI_1280, UI_1920 } from "../src/ui/city/tokens.ts"
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -35,7 +35,7 @@ const markdown = [
   "由 `scripts/ui-table.mjs` 自 `src/ui/city/tokens.ts` 生成。1920 欄是 `scale(UI_1280, 1.5)`，沒有第二套手寫數字。",
   "",
   `安全區 1280：(${SAFE_RECT.x},${SAFE_RECT.y},${SAFE_RECT.w},${SAFE_RECT.h})；1920：(${SAFE_RECT_1920.x},${SAFE_RECT_1920.y},${SAFE_RECT_1920.w},${SAFE_RECT_1920.h})。`,
-  `相機 offset 1280：(${CAMERA.offset.x},${CAMERA.offset.y})；1920：(${CAMERA.offset1920.x},${CAMERA.offset1920.y})。預設 zoom ${CAMERA.zoom}。`,
+  `鏡頭對準 tile (14,13)，錨在安全區中心。1280 anchor (${CAMERA.anchor.x},${CAMERA.anchor.y})；1920 anchor (${CAMERA.anchor1920.x},${CAMERA.anchor1920.y})。預設 zoom ${CAMERA.zoom}。世界 zoom 不移動 UI。`,
   "",
   "| id | 名稱 | 群組 | 1280 x | 1280 y | 1280 w | 1280 h | 1920 x | 1920 y | 1920 w | 1920 h |",
   "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
@@ -63,7 +63,7 @@ MOCK_QUEUE.forEach((slot) => {
 })
 
 function frameMarkup(profile, label) {
-  const world = artboardFrame(CAMERA_DEFAULT_ZOOM, profile)
+  const world = overviewFrame(CAMERA_DEFAULT_ZOOM, profile)
   const panels = ["area_left", "area_chat", "area_actions", "area_queue"]
     .map((id) => profile.nodes.find((item) => item.id === id))
     .map(
@@ -81,7 +81,7 @@ function frameMarkup(profile, label) {
       return `<div class="node${valueClass}"${queueAttr} style="left:${node.x}px;top:${node.y}px;width:${node.w}px;height:${node.h}px;font-size:${font}px">${escapeHtml(text)}</div>`
     })
     .join("")
-  return `<section><h2>${escapeHtml(label)}</h2><div class="frame" style="width:${profile.screenW}px;height:${profile.screenH}px">${panels}<img alt="" src="../../public/art/board/city-placeholder.svg" style="left:${world.x}px;top:${world.y}px;width:${world.w}px;height:${world.h}px"/>${bits}</div></section>`
+  return `<section><h2>${escapeHtml(label)}</h2><div class="frame" style="width:${profile.screenW}px;height:${profile.screenH}px">${panels}<img alt="" src="../../public/art/board/iris-v1-town-overview.jpg" style="left:${world.x}px;top:${world.y}px;width:${world.w}px;height:${world.h}px"/>${bits}</div></section>`
 }
 
 const queueBoot = MOCK_QUEUE.map((slot) => ({
