@@ -1,0 +1,54 @@
+# 紅線自證（base d8072d8 → HEAD abe4950）
+
+## git diff --stat
+ docs/evidence/B4E3/build.txt                       |   31 +
+ docs/evidence/B4E3/city-1280.png                   |  Bin 0 -> 120090 bytes
+ docs/evidence/B4E3/city-1920.png                   |  Bin 0 -> 251963 bytes
+ docs/evidence/B4E3/city-check.txt                  |    5 +
+ docs/evidence/B4E3/hot-card-drill.png              |  Bin 0 -> 122544 bytes
+ docs/evidence/B4E3/ui-check.txt                    |    7 +
+ docs/evidence/B4E3/vitest.txt                      |   12 +
+ docs/evidence/B4S/anchors-run.txt                  |   47 +
+ docs/evidence/B4S/anchors-twice-diff.txt           |    0
+ docs/evidence/B4S/build.txt                        |   31 +
+ docs/evidence/B4S/check-no-syslog.txt              |    1 +
+ docs/evidence/B4S/city-check.txt                   |    5 +
+ docs/evidence/B4S/gs-metrics.txt                   |   20 +
+ docs/evidence/B4S/gs6-gs8.txt                      |    6 +
+ docs/evidence/B4S/gs7-reverse.txt                  |    3 +
+ docs/evidence/B4S/syslog-1280.png                  |  Bin 0 -> 117978 bytes
+ docs/evidence/B4S/syslog-1920.png                  |  Bin 0 -> 217962 bytes
+ docs/evidence/B4S/syslog-error-frozen-1280.png     |  Bin 0 -> 193720 bytes
+ docs/evidence/B4S/ui-check.txt                     |    7 +
+ docs/evidence/B4S/vitest.txt                       | 2225 ++++++++++++++++++++
+ ...240\274\345\260\215\347\205\247\350\241\250.md" |   41 +
+ docs/ui/city-1280.png                              |  Bin 117216 -> 120090 bytes
+ docs/ui/city-1920.png                              |  Bin 249791 -> 251963 bytes
+ docs/ui/mock.html                                  |    4 +-
+ ...16UI\345\272\247\346\250\231\350\241\250_v1.md" |   17 +-
+ scripts/check-no-syslog.mjs                        |   34 +
+ scripts/ui-check.mjs                               |    2 +-
+ ...52\347\222\260\350\246\217\346\240\274_v0.1.md" |   88 +
+ src/dev/syslog/index.ts                            |  175 ++
+ src/dev/syslog/overlay.ts                          |  153 ++
+ src/dev/syslog/stub.ts                             |   35 +
+ src/dev/syslog/types.ts                            |   36 +
+ src/main.tsx                                       |    6 +
+ src/ui/city/BottomBar.tsx                          |    6 +-
+ src/ui/city/CityScreen.tsx                         |  117 +-
+ src/ui/city/LeftPanel.tsx                          |   60 +-
+ src/ui/city/WorldHotZones.tsx                      |  131 ++
+ src/ui/city/mock.ts                                |    3 +
+ src/ui/city/tokens.ts                              |   11 +-
+ src/vite-env.d.ts                                  |    8 +
+ tests/b4e3.test.ts                                 |   47 +
+ tests/syslog.test.ts                               |   81 +
+ tsconfig.app.json                                  |    3 +-
+ vite.config.ts                                     |   10 +-
+ 44 files changed, 3423 insertions(+), 45 deletions(-)
+
+## cityLayout.json md5
+e380c3abaea0e451008b2c03fcd5ae13  data/cityLayout.json
+
+## 紅線三檔 diff 行數（0 = 零改動）
+git diff d8072d8 HEAD -- data/cityLayout.json src/combat data/units.json | wc -l = 0

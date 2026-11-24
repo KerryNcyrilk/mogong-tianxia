@@ -193,7 +193,7 @@ function safeLine() {
   if (!pass || intersect !== 0) console.error(`safe intersect=${intersect}`)
   return {
     pass: pass && intersect === 0,
-    line: `safe: ${pass && intersect === 0 ? "PASS" : "FAIL"} (gov/drill/gate_s inside, ui∩safe=${intersect === 0 ? 0 : intersect})`,
+    line: `safe: ${pass && intersect === 0 ? "PASS" : "FAIL"} (gov/drill/gate_s inside, ui∩subject=${intersect === 0 ? 0 : intersect})`,
   }
 }
 

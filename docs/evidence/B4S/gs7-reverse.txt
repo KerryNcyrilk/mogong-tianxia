@@ -1,0 +1,3 @@
+/tmp/tx2/dist/assets/index-BFY6iJ6T.js: sysLog. x1
+check-no-syslog: FAIL (1 hits in 13 js files)
+GS7 reverse exit=1

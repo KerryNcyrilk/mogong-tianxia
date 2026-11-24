@@ -127,6 +127,7 @@ function troopNodes(): UiNode[] {
     const id = `troop_${index}`
     nodes.push(
       { id, label, x: 12, y, w: 252, h: 24, group: "troops", fontRole: "body", fontSize: 12 },
+      { id: `${id}_icon`, label: `${label}圖標`, x: 14, y: y + 4, w: 16, h: 16, group: "troops", fontRole: "body", fontSize: 10 },
       {
         id: `${id}_count`,
         label: `${label}數量`,
@@ -260,6 +261,7 @@ function baselineNodes(): UiNode[] {
     { id: "ranking", label: "排行", x: 102, y: 90, w: 60, h: 18, group: "left", fontRole: "body", fontSize: 10 },
     { id: "ranking_hit", label: "排行點擊", x: 102, y: 80, w: 60, h: 32, group: "left", hit: "control" },
     { id: "city_name", label: "城池名列", x: 0, y: 112, w: 276, h: 32, group: "left", fontRole: "body", fontSize: 16 },
+    { id: "city_name_arrow", label: "城池名下拉箭頭", x: 250, y: 118, w: 12, h: 20, group: "left" },
     ...resourceNodes(),
     { id: "general_panel", label: "武將面板", x: 0, y: 368, w: 276, h: 352, group: "left" },
     { id: "tab_general", label: "武將", x: 12, y: 376, w: 64, h: 26, group: "left", fontRole: "body", fontSize: 12 },
@@ -268,7 +270,14 @@ function baselineNodes(): UiNode[] {
     { id: "tab_troops_hit", label: "兵力點擊", x: 78, y: 373, w: 64, h: 32, group: "left", hit: "control" },
     { id: "general_card", label: "武將卡", x: 12, y: 410, w: 252, h: 120, group: "left" },
     { id: "general_name", label: "武將名", x: 24, y: 422, w: 220, h: 22, group: "left", fontRole: "body", fontSize: 16 },
-    { id: "general_stat", label: "武將數值", x: 24, y: 450, w: 220, h: 18, group: "left", fontRole: "value", fontSize: 12 },
+    { id: "general_level", label: "武將等級", x: 24, y: 446, w: 56, h: 16, group: "left", fontRole: "body", fontSize: 10 },
+    { id: "general_stat", label: "武將數值", x: 88, y: 444, w: 156, h: 18, group: "left", fontRole: "value", fontSize: 12 },
+    { id: "general_exp", label: "經驗條", x: 24, y: 468, w: 204, h: 8, group: "left" },
+    { id: "general_status", label: "武將狀態", x: 24, y: 480, w: 204, h: 16, group: "left", fontRole: "body", fontSize: 10 },
+    { id: "general_skill", label: "技能鈕", x: 24, y: 502, w: 40, h: 18, group: "left", fontRole: "body", fontSize: 10 },
+    { id: "general_skill_hit", label: "技能點擊", x: 24, y: 496, w: 40, h: 32, group: "left", hit: "control" },
+    { id: "general_equip", label: "裝備鈕", x: 72, y: 502, w: 40, h: 18, group: "left", fontRole: "body", fontSize: 10 },
+    { id: "general_equip_hit", label: "裝備點擊", x: 72, y: 496, w: 40, h: 32, group: "left", hit: "control" },
     ...troopNodes(),
     ...chatNodes(),
     ...actionNodes(),

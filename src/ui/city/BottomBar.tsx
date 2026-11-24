@@ -1,4 +1,5 @@
 import type { FormEvent } from "react"
+import { sysLog } from "@syslog"
 import { place, textFace } from "./box.ts"
 import { MOCK_ACTIONS, MOCK_CHAT_TABS, MOCK_QUEUE, formatHMS, queueTitle, type MockQueueSlot } from "./mock.ts"
 import { FaceButton, Panel } from "./parts.tsx"
@@ -101,7 +102,10 @@ export function BottomBar({
               stacked={frozen}
               background={shop ? STYLE.cinnabar : STYLE.panelRaise}
               title={frozen ? "競技 戰鬥系統待 B6" : action.label}
-              onClick={() => onAction(`MOCK_${action.label}`)}
+              onClick={() => {
+                if (__SYSLOG__) sysLog.info("ui", "button.click", { control: action.id })
+                onAction(`MOCK_${action.label}`)
+              }}
             >
               {frozen ? (
                 <>

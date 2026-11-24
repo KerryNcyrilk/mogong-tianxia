@@ -34,9 +34,15 @@ export function LeftPanel({
   const peerage = uiNode(profile, "peerage")
   const alliance = uiNode(profile, "alliance")
   const city = uiNode(profile, "city_name")
+  const cityArrow = uiNode(profile, "city_name_arrow")
   const card = uiNode(profile, "general_card")
   const generalName = uiNode(profile, "general_name")
   const generalStat = uiNode(profile, "general_stat")
+  const generalLevel = uiNode(profile, "general_level")
+  const generalExp = uiNode(profile, "general_exp")
+  const generalStatus = uiNode(profile, "general_status")
+  const generalSkill = uiNode(profile, "general_skill")
+  const generalEquip = uiNode(profile, "general_equip")
   const tabGeneral = uiNode(profile, "tab_general")
   const tabTroops = uiNode(profile, "tab_troops")
 
@@ -98,12 +104,13 @@ export function LeftPanel({
         排行
       </FaceButton>
       <div
+        title={log}
+        aria-label={`${MOCK_LORD.city} ${log}`}
         style={{
           ...place(city, panel),
           ...textFace(city, "title"),
           display: "flex",
           alignItems: "center",
-          gap: 8,
           paddingLeft: 12,
           background: STYLE.panel,
           overflow: "hidden",
@@ -111,7 +118,11 @@ export function LeftPanel({
         }}
       >
         <span>{MOCK_LORD.city}</span>
-        <span style={{ color: STYLE.textMuted }}>{log}</span>
+        <span style={{ ...place(cityArrow, city), display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg viewBox="0 0 12 20" width="100%" height="100%" aria-hidden>
+            <polygon points="2,8 10,8 6,14" fill={STYLE.gold} />
+          </svg>
+        </span>
       </div>
       {MOCK_RESOURCES.map((resource, index) => {
         const row = uiNode(profile, resource.id)
@@ -183,10 +194,38 @@ export function LeftPanel({
         }}
       >
         <p style={{ ...place(generalName, card), ...textFace(generalName, "title") }}>{MOCK_GENERAL.name}</p>
-        <p style={{ ...place(generalStat, card), ...textFace(generalStat, "value") }}>{MOCK_GENERAL.stat}</p>
+        <p style={{ ...place(generalLevel, card), ...textFace(generalLevel, "title") }}>Lv.{MOCK_GENERAL.level}</p>
+        <p style={{ ...place(generalStat, card), ...textFace(generalStat, "value"), display: "flex", alignItems: "center" }}>
+          {MOCK_GENERAL.stat}
+        </p>
+        <div style={{ ...place(generalExp, card), background: STYLE.border, boxShadow: `inset 0 0 0 1px ${STYLE.gold}` }}>
+          <div style={{ width: `${MOCK_GENERAL.expPct}%`, height: "100%", background: STYLE.building }} />
+        </div>
+        <p style={{ ...place(generalStatus, card), ...textFace(generalStatus, "title"), display: "flex", alignItems: "center" }}>
+          狀態：{MOCK_GENERAL.status}
+        </p>
+        <FaceButton
+          origin={card}
+          face={generalSkill}
+          hit={controlNode(profile, "general_skill")}
+          title="技能"
+          onClick={() => onAction("MOCK_技能")}
+        >
+          技能
+        </FaceButton>
+        <FaceButton
+          origin={card}
+          face={generalEquip}
+          hit={controlNode(profile, "general_equip")}
+          title="裝備"
+          onClick={() => onAction("MOCK_裝備")}
+        >
+          裝備
+        </FaceButton>
       </div>
       {MOCK_TROOPS.map((troop, index) => {
         const row = uiNode(profile, `troop_${index}`)
+        const icon = uiNode(profile, `troop_${index}_icon`)
         const count = uiNode(profile, `troop_${index}_count`)
         return (
           <div
@@ -198,7 +237,20 @@ export function LeftPanel({
               boxShadow: `inset 0 -1px 0 ${STYLE.border}`,
             }}
           >
-            <span style={{ ...textFace(row, "title"), display: "flex", alignItems: "center", height: "100%", paddingLeft: 8 }}>
+            <span
+              data-ui-id={icon.id}
+              style={{
+                ...place(icon, row),
+                background: STYLE.panelRaise,
+                boxShadow: `inset 0 0 0 1px ${STYLE.gold}`,
+                ...textFace(icon, "title"),
+                display: "grid",
+                placeItems: "center",
+              }}
+            >
+              {troop.name.slice(0, 1)}
+            </span>
+            <span style={{ ...textFace(row, "title"), display: "flex", alignItems: "center", height: "100%", paddingLeft: 36 }}>
               {troop.name}
             </span>
             <span
