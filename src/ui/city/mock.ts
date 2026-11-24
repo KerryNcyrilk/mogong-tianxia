@@ -34,6 +34,9 @@ export const MOCK_LORD = {
 export const MOCK_GENERAL = {
   name: "MOCK_墨翟",
   stat: "MOCK_攻 42 防 36",
+  level: 12,
+  expPct: 64,
+  status: "待命",
 } as const
 
 export const MOCK_RESOURCES: readonly MockResource[] = [

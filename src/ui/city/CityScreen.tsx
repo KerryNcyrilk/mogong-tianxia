@@ -2,10 +2,10 @@ import { useEffect, useState } from "react"
 import { BottomBar } from "./BottomBar.tsx"
 import { CornerButtons } from "./CornerButtons.tsx"
 import { LeftPanel } from "./LeftPanel.tsx"
-import { FaceButton } from "./parts.tsx"
 import { MOCK_CHAT_SEED, MOCK_CHAT_TABS } from "./mock.ts"
 import { artboardFrame, profileOf } from "./rects.ts"
-import { CAMERA_DEFAULT_ZOOM, CAMERA_ZOOMS, STYLE, uiNode, type UiProfile } from "./tokens.ts"
+import { WorldHotZones } from "./WorldHotZones.tsx"
+import { CAMERA_DEFAULT_ZOOM, CAMERA_ZOOMS, STYLE, type UiProfile } from "./tokens.ts"
 
 type ChatId = (typeof MOCK_CHAT_TABS)[number]["id"]
 
@@ -57,8 +57,6 @@ export function CityScreen() {
 
   const profile: UiProfile = profileOf(size)
   const world = artboardFrame(zoom, profile)
-  const drill = uiNode(profile, "combat_drill")
-  const muster = uiNode(profile, "combat_muster")
 
   function sendChat() {
     const text = drafts[chatTab].trim()
@@ -114,35 +112,26 @@ export function CityScreen() {
           color: STYLE.text,
         }}
       >
-        <img
-          src="/art/board/city-placeholder.svg"
-          alt=""
-          draggable={false}
-          style={{
-            position: "absolute",
-            left: world.x,
-            top: world.y,
-            width: world.w,
-            height: world.h,
-            pointerEvents: "none",
-          }}
-        />
-        <FaceButton
-          origin={{ x: 0, y: 0 }}
-          face={drill}
-          disabled
-          stacked
-          title="校場 戰鬥系統待 B6"
-        >
-          <span>校場</span>
-          <span>戰鬥系統待 B6</span>
-        </FaceButton>
-        <FaceButton origin={{ x: 0, y: 0 }} face={muster} disabled stacked title="點兵場 戰鬥系統待 B6">
-          <span>點兵場</span>
-          <span>戰鬥系統待 B6</span>
-        </FaceButton>
-        <LeftPanel profile={profile} tab={tab} log={log} onTab={setTab} onAction={setLog} />
-        <BottomBar
+        {outside ? (
+          <OutsideScene profile={profile} />
+        ) : (
+          <>
+            <img
+              src="/art/board/city-placeholder.svg"
+              alt=""
+              draggable={false}
+              style={{
+                position: "absolute",
+                left: world.x,
+                top: world.y,
+                width: world.w,
+                height: world.h,
+                pointerEvents: "none",
+              }}
+            />
+            <WorldHotZones profile={profile} zoom={zoom} onAction={setLog} />
+            <LeftPanel profile={profile} tab={tab} log={log} onTab={setTab} onAction={setLog} />
+            <BottomBar
           profile={profile}
           chatTab={chatTab}
           messages={chats[chatTab]}
@@ -156,6 +145,8 @@ export function CityScreen() {
           onSend={sendChat}
           onAction={setLog}
         />
+          </>
+        )}
         <CornerButtons
           profile={profile}
           outside={outside}
@@ -175,6 +166,61 @@ export function CityScreen() {
           }}
         />
       </div>
+    </div>
+  )
+}
+
+function OutsideScene({ profile }: { profile: UiProfile }) {
+  const tiles = ["墨城", "野村", "山口"] as const
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: profile.screenW,
+        height: profile.screenH,
+        background: STYLE.grass,
+        backgroundImage: `linear-gradient(to right, ${STYLE.queued} 1px, transparent 1px), linear-gradient(to bottom, ${STYLE.queued} 1px, transparent 1px)`,
+        backgroundSize: "40px 40px",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: profile.safe.x + 12,
+          top: 12,
+          padding: "6px 12px",
+          background: STYLE.panel,
+          color: STYLE.text,
+          boxShadow: `inset 0 0 0 2px ${STYLE.border}, inset 0 0 0 3px ${STYLE.gold}`,
+          fontFamily: STYLE.fontTitle,
+          fontSize: 12,
+        }}
+      >
+        大地圖（佔位）｜40×40 圖塊｜不接移動與戰鬥
+      </div>
+      {tiles.map((name, index) => (
+        <div
+          key={name}
+          style={{
+            position: "absolute",
+            left: profile.safe.x + 60 + index * 200,
+            top: 240 + (index % 2) * 80,
+            width: 80,
+            height: 80,
+            display: "grid",
+            placeItems: "center",
+            background: STYLE.panelRaise,
+            color: STYLE.text,
+            boxShadow: `inset 0 0 0 2px ${STYLE.border}, inset 0 0 0 3px ${STYLE.gold}`,
+            fontFamily: STYLE.fontTitle,
+            fontSize: 12,
+          }}
+        >
+          {name}
+        </div>
+      ))}
     </div>
   )
 }
