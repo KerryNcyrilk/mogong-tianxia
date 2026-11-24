@@ -1,0 +1,20 @@
+# B4S 量測與執行期證據（本機頭less Chromium + CDP）
+
+## GS2 寫入成本（dev 執行期，1280 窗）
+- 批次法：100 次寫入為一組，共 1000 組 → 每組耗時再除以 100
+  - p50 = 0.017 ms
+  - p95 = 0.030 ms   ← 門檻 < 0.05 ms  PASS
+  - p99 = 0.035 ms
+  - max = 0.053 ms
+- 單次 performance.now() 解析度為 0.1 ms，直接量單次會得 0/0.1，故改用批次正規化。
+- 對照：20 萬次連續寫入總耗 3746 ms → 平均 0.0187 ms/次。
+
+## GS3 overlay 幾何與遮擋
+- 1280：rect (700,300,560,340)；與建造隊列 (1122,650,158,70) 相交面積 = 0
+- 1920（innerWidth 1990 觸發 ×1.5）：rect (1050,450,840,510)；與隊列 (1683,975,237,105) 相交面積 = 0
+
+## GS8 執行期
+- prod（vite preview :4190/city）：typeof window.__syslog__ = "undefined"；overlay 元素不存在
+- dev（vite :4191/city）：typeof window.__syslog__ = "object"；金鑰 = trace,debug,info,warn,error,time,assert,snapshot,exportText,setLevel
+- dev F9 連按兩次：display block → none → block（單一 overlay 實例）
+- ERROR 寫入後：box 自動 display:block、紅框、標題出現 FROZEN（截圖 syslog-error-frozen-1280.png）

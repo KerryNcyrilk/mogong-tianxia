@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { sysLog } from "@syslog"
 import { BottomBar } from "./BottomBar.tsx"
 import { CornerButtons } from "./CornerButtons.tsx"
 import { LeftPanel } from "./LeftPanel.tsx"
@@ -46,6 +47,10 @@ export function CityScreen() {
   const [intelOn, setIntelOn] = useState(false)
   const [log, setLog] = useState("MOCK_待命")
   const [elapsed, setElapsed] = useState(0)
+
+  useEffect(() => {
+    if (__SYSLOG__) sysLog.info("city", "camera.move", { zoom, size })
+  }, [zoom, size])
 
   useEffect(() => {
     const started = Date.now()

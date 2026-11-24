@@ -1,0 +1,47 @@
+ ✓ tests/anchors.test.ts > v4.0 A formula > A no-counter hit stays at C 1.00 ms
+ ✓ tests/anchors.test.ts > v4.0 A formula > A defense is subtracted inside the formula ms
+ ✓ tests/anchors.test.ts > v4.0 A formula > A floor drops the fraction, including one half ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B xuezhe to gong is 1.25 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B gong to dun is 1.25 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B dun to dao is 1.25 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B dao to ji is 1.25 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B ji to qi is 1.25 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B qi to xuezhe is 1.25 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B gong to xuezhe is 0.80 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B dun to gong is 0.80 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B dao to dun is 0.80 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B ji to dao is 0.80 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B qi to ji is 0.80 ms
+ ✓ tests/anchors.test.ts > v4.0 B counters > B xuezhe to qi is 0.80 ms
+ ✓ tests/anchors.test.ts > v4.0 C morale > C morale 0.75 scales after defense ms
+ ✓ tests/anchors.test.ts > v4.0 C morale > C morale 1.25 scales after defense ms
+ ✓ tests/anchors.test.ts > v4.0 D anchors > D A1 is 1000 ms
+ ✓ tests/anchors.test.ts > v4.0 D anchors > D A2 is 1250 ms
+ ✓ tests/anchors.test.ts > v4.0 D anchors > D A5 is 4374 ms
+ ✓ tests/anchors.test.ts > v4.0 E initiative > E higher spd acts first ms
+ ✓ tests/anchors.test.ts > v4.0 E initiative > E equal spd lets the attacker act first ms
+ ✓ tests/anchors.test.ts > v4.0 E initiative > E the same side and spd follow formation index ms
+ ✓ tests/anchors.test.ts > v4.0 E initiative > E a unit that dies is removed from the rest of the turn ms
+ ✓ tests/anchors.test.ts > v4.0 F outcome > F a wiped side loses ms
+ ✓ tests/anchors.test.ts > v4.0 F outcome > F turn 15 with both sides alive is an attacker loss ms
+ ✓ tests/anchors.test.ts > v4.0 F outcome > F turn 14 does not end the battle ms
+ ✓ tests/anchors.test.ts > v4.0 F outcome > F a mutual wipe in the same turn is a defender win ms
+ ✓ tests/anchors.test.ts > v4.0 F outcome > F turns counts the turn that actually ends the fight ms
+ ✓ tests/anchors.test.ts > v4.0 G bounds > G negative damage clamps to 0 ms
+ ✓ tests/anchors.test.ts > v4.0 G bounds > G overkill is discarded ms
+ ✓ tests/anchors.test.ts > v4.0 G bounds > G a huge atk does not wrap ms
+ ✓ tests/anchors.test.ts > v4.0 G bounds > G defense above the attack value deals 0 ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > balance.json holds the v4.0 tunables ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > live unit table keeps defense above zero ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > grid slice A1 1620 archers atk 2.0, no general, no advantage, fixture DEF 0 → 3240 ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > grid slice A2 560 scholars atk 10.0, no general, no advantage, fixture DEF 0 → 5600 ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > grid slice A3 skill attribute 400, coefficient 7.5 → 3000 within 1% ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > grid slice A4 tower floor 10, 840 archers × 10 HP → total HP 8400 ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > grid slice A5 general atk 70 versus 8400 HP clears in at most 2 turns at 4374 per turn ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > negative base damage on the grid slice clamps to 0, with or without attack aura ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > retaliation uses the same formula with advantage forced to 1, once per unit per turn ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > grid initiative order is cavalry, blade, beast, bow, scholar, halberd, shield ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > fifteen grid turns still unresolved is an attacker loss ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > grid is 12 by 8 and a general does not take a cell or a roster slot ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > art manifest keeps a stable slot for every unit, the aura, the board, and chrome ms
+ ✓ tests/anchors.test.ts > grid slice kept from the first combat tests > sandbox squads keep positive defense and open on cavalry ms

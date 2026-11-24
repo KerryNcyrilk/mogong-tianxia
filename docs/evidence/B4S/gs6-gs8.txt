@@ -1,0 +1,6 @@
+== GS8 bundle delta ==
+prod(stub, 3 call sites present)=579351 B
+prod(stub, call sites stripped)=579319 B
+delta=32 B (<= 0.3 KB = 307 B) PASS
+== GS6 ==
+check-no-syslog exit 0；dist 內 sysLog./__syslog__/SYSLOG_EXPORT/exportText/snapshot( 全 0 命中
