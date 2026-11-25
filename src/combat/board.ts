@@ -3,7 +3,7 @@ import catalog from "../../data/units.json" with { type: "json" }
 import { calcDamage } from "./damage.ts"
 import { canonicalUnitId } from "./counter.ts"
 import { cellKey, inBounds } from "./grid.ts"
-import type { Side, Squad, UnitType } from "./types.ts"
+import type { Side, SkillRef, Squad, UnitType } from "./types.ts"
 
 /** B2 手動棋盤戰棋（12×8）。規則真源：data/boardMove.json。 */
 
@@ -23,23 +23,29 @@ export interface BoardUnit {
   index: number
   generalAtk: number
   generalDef: number
+  /** B6：武將主動技能（B2 預留的 castSkill 接口在此落地）。 */
+  skills: SkillRef[]
+  /** 技能冷卻剩餘回合，鍵為技能 id。 */
+  cd: Record<string, number>
 }
 
-export type BoardReason = "not-your-turn" | "out-of-range" | "blocked"
+export type BoardReason = "not-your-turn" | "out-of-range" | "blocked" | "no-skill" | "cooling"
 
 export type Command =
   | { type: "move"; unitId: string; to: { x: number; y: number } }
   | { type: "attack"; unitId: string; targetId: string }
   | { type: "wait"; unitId: string }
+  | { type: "skill"; unitId: string; skillId: string; targetId: string }
   | { type: "toggleAuto"; enabled: boolean }
 
 export interface BoardLog {
   turn: number
   side: Side
   unitId: string
-  kind: "move" | "attack" | "wait" | "auto"
+  kind: "move" | "attack" | "wait" | "auto" | "skill"
   to?: { x: number; y: number }
   targetId?: string
+  skillId?: string
   damage?: number
 }
 
@@ -96,6 +102,8 @@ function unitFromSquad(squad: Squad, index: number): BoardUnit {
     index,
     generalAtk: squad.general?.atk ?? 0,
     generalDef: squad.general?.def ?? 0,
+    skills: squad.general?.skills ?? [],
+    cd: {},
   }
 }
 
@@ -126,7 +134,7 @@ export function alive(units: readonly BoardUnit[], side?: Side): BoardUnit[] {
 function clone(state: BoardState): BoardState {
   return {
     ...state,
-    units: state.units.map((unit) => ({ ...unit })),
+    units: state.units.map((unit) => ({ ...unit, cd: { ...unit.cd } })),
     acted: [...state.acted],
     log: [...state.log],
   }
@@ -194,7 +202,12 @@ function advance(state: BoardState): BoardState {
   const finished = initiative(state).every((unit) => state.acted.includes(unit.id))
   if (!finished) return state
   if (state.side === "attacker") return { ...state, side: "defender", acted: [] }
-  return { ...state, side: "attacker", acted: [], turn: state.turn + 1 }
+  const cooled = state.units.map((unit) => {
+    const cd: Record<string, number> = {}
+    for (const [key, value] of Object.entries(unit.cd)) cd[key] = Math.max(0, value - 1)
+    return { ...unit, cd }
+  })
+  return { ...state, units: cooled, side: "attacker", acted: [], turn: state.turn + 1 }
 }
 
 function moraleFor(state: BoardState, side: Side): number {
@@ -229,6 +242,34 @@ export function applyCommand(state: BoardState, command: Command): ApplyResult {
     moving.y = command.to.y
     next.acted.push(unit.id)
     next.log.push({ turn: next.turn, side: next.side, unitId: unit.id, kind: "move", to: command.to })
+    return { state: checkOver(advance(next)), ok: true, reason: null }
+  }
+
+  if (command.type === "skill") {
+    const skill = moving.skills.find((item) => item.id === command.skillId)
+    if (!skill) return { state, ok: false, reason: "no-skill" }
+    if ((moving.cd[skill.id] ?? 0) > 0) return { state, ok: false, reason: "cooling" }
+    const target = next.units.find((item) => item.id === command.targetId)
+    if (!target || target.hp <= 0 || target.side === unit.side) return { state, ok: false, reason: "blocked" }
+    if (manhattan(unit, target) > skill.range) return { state, ok: false, reason: "out-of-range" }
+    const raw = calcDamage(
+      { id: unit.type, atk: unit.atk, def: unit.def, spd: unit.spd, range: unit.range, hp: unit.hp, side: unit.side },
+      { id: target.type, atk: target.atk, def: target.def, spd: target.spd, range: target.range, hp: target.hp, side: target.side },
+      { morale: moraleFor(next, unit.side) },
+    )
+    const damage = Math.min(target.hp, Math.round(raw * skill.power))
+    target.hp = Math.max(0, target.hp - damage)
+    moving.cd[skill.id] = skill.cooldown
+    next.acted.push(unit.id)
+    next.log.push({
+      turn: next.turn,
+      side: next.side,
+      unitId: unit.id,
+      kind: "skill",
+      targetId: target.id,
+      skillId: skill.id,
+      damage,
+    })
     return { state: checkOver(advance(next)), ok: true, reason: null }
   }
 
@@ -285,6 +326,21 @@ export function autoCommands(state: BoardState): Command[] {
       commands.push(c)
       working = applyCommand(working, c).state
       continue
+    }
+    const usable = unit.skills.filter((skill) => (unit.cd[skill.id] ?? 0) === 0)
+    if (usable.length > 0) {
+      const skill = usable[0]
+      if (skill) {
+        const target = enemies
+          .filter((enemy) => manhattan(unit, enemy) <= skill.range)
+          .sort((a, b) => (a.hp !== b.hp ? a.hp - b.hp : a.id < b.id ? -1 : 1))[0]
+        if (target) {
+          const c: Command = { type: "skill", unitId: unit.id, skillId: skill.id, targetId: target.id }
+          commands.push(c)
+          working = applyCommand(working, c).state
+          continue
+        }
+      }
     }
     const inRange = enemies.filter((enemy) => manhattan(unit, enemy) <= unit.range)
     if (inRange.length > 0) {

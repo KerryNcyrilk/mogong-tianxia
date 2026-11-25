@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button.tsx"
 import { artManifest } from "../art/manifest.ts"
 import { createBattle, isAlive, sideHp, step, type BattleState } from "../combat/battle.ts"
 import {
+  activeUnitId,
   applyCommand,
   autoTurn,
   createBoard,
@@ -15,6 +16,8 @@ import { UNIT_LABEL } from "../combat/initiative.ts"
 import { formatDamage, formatEvent, formatWinner, squadName } from "../sandbox/format.ts"
 import { createScenario } from "../sandbox/scenario.ts"
 import type { Squad } from "../combat/types.ts"
+import { GENERAL_CONFIG } from "../general/config.ts"
+import { makeGeneral, statsOf } from "../general/engine.ts"
 import { BattleCanvas } from "./BattleCanvas.tsx"
 
 class CanvasBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -34,6 +37,24 @@ class CanvasBoundary extends Component<{ children: ReactNode }, { failed: boolea
     }
     return this.props.children
   }
+}
+
+/** B6 示範：把武將（禽滑釐 · 火計）接到棋盤上，走 B2 預留的技能接口。 */
+function boardWithGeneral(): BoardState {
+  const base = createBoard(createScenario())
+  const record = makeGeneral("g_qinwuyang", GENERAL_CONFIG, 0)
+  if (!record) return base
+  const stats = statsOf(record, GENERAL_CONFIG)
+  const skills = GENERAL_CONFIG.skills
+    .filter((skill) => record.skills.includes(skill.id) && skill.kind === "active")
+    .map((skill) => ({ id: skill.id, name: skill.name, range: skill.range ?? 1, power: skill.power ?? 1, cooldown: skill.cooldown ?? 1 }))
+  const general = { id: record.id, name: record.name, atk: stats.atk, def: stats.def, skills }
+  const caster = base.units.find((unit) => unit.side === "attacker" && unit.range >= 3)
+  if (!caster) return base
+  caster.skills = general.skills
+  caster.generalAtk = general.atk
+  caster.generalDef = general.def
+  return { ...base, units: base.units.map((unit) => (unit.id === caster.id ? { ...caster } : unit)) }
 }
 
 function freshBattle(): BattleState {
@@ -68,9 +89,10 @@ const REASON_TEXT: Record<string, string> = {
 
 /** B2 手動棋盤：一格一步移動／攻擊／待機，另有託管切換。 */
 function ManualBoard() {
-  const [board, setBoard] = useState<BoardState>(() => createBoard(createScenario()))
+  const [board, setBoard] = useState<BoardState>(() => boardWithGeneral())
   const [selected, setSelected] = useState<string | null>(null)
   const [notice, setNotice] = useState("")
+  const [skillMode, setSkillMode] = useState<string | null>(null)
 
   useEffect(() => {
     if (!board.auto || board.over) return
@@ -82,6 +104,7 @@ function ManualBoard() {
 
   const squads = useMemo(() => board.units.map(toSquad), [board])
   const mine = board.units.find((unit) => unit.id === selected && unit.hp > 0)
+  const actor = mine ?? board.units.find((unit) => unit.id === activeUnitId(board) && unit.hp > 0)
   const moveCells = useMemo(() => {
     if (!mine || board.auto) return new Set<string>()
     const set = new Set<string>()
@@ -97,10 +120,11 @@ function ManualBoard() {
     for (const unit of board.units) {
       if (unit.hp <= 0 || unit.side === mine.side) continue
       const dist = Math.abs(unit.x - mine.x) + Math.abs(unit.y - mine.y)
-      if (dist <= mine.range) set.add(cellKey(unit.x, unit.y))
+      const skill = mine.skills.find((item) => item.id === skillMode)
+      if (dist <= (skill?.range ?? mine.range)) set.add(cellKey(unit.x, unit.y))
     }
     return set
-  }, [board, mine])
+  }, [board, mine, skillMode])
 
   const run = (command: Parameters<typeof applyCommand>[1]) => {
     const result = applyCommand(board.auto ? board : board, command)
@@ -121,6 +145,11 @@ function ManualBoard() {
           setNotice("先選一支自己的部隊。")
           return
         }
+        if (skillMode) {
+          run({ type: "skill", unitId: selected, skillId: skillMode, targetId: target.id })
+          setSkillMode(null)
+          return
+        }
         run({ type: "attack", unitId: selected, targetId: target.id })
         return
       }
@@ -129,6 +158,7 @@ function ManualBoard() {
         return
       }
       setSelected(target.id)
+      setSkillMode(null)
       setNotice("")
       return
     }
@@ -174,6 +204,26 @@ function ManualBoard() {
           >
             {board.auto ? "手動接回" : "託管"}
           </button>
+          {actor?.skills.map((skill) => {
+            const cooling = (actor.cd[skill.id] ?? 0) > 0
+            return (
+              <button
+                key={skill.id}
+                type="button"
+                onClick={() => {
+                  if (actor) setSelected(actor.id)
+                  setSkillMode(skill.id)
+                  setNotice(`${skill.name}：點射程內的敵軍`)
+                }}
+                className="h-8 rounded-sm border border-border px-3"
+                disabled={board.auto || cooling || Boolean(board.over)}
+                title={skill.name}
+              >
+                {skill.name}
+                {cooling ? `（冷卻 ${actor.cd[skill.id]}）` : ""}
+              </button>
+            )
+          })}
           <button
             type="button"
             onClick={() => run({ type: "wait", unitId: selected ?? "" })}
@@ -185,7 +235,7 @@ function ManualBoard() {
           <button
             type="button"
             onClick={() => {
-              setBoard(createBoard(createScenario()))
+              setBoard(boardWithGeneral())
               setSelected(null)
               setNotice("")
             }}
@@ -225,7 +275,9 @@ function ManualBoard() {
               {board.log.slice(-12).map((entry, index) => (
                 <li key={`${entry.kind}-${entry.turn}-${index}`}>
                   第{entry.turn}回合 {entry.unitId}
-                  {entry.kind === "attack"
+                  {entry.kind === "skill"
+                    ? ` 施 ${entry.skillId ?? "技能"} 於 ${entry.targetId}（${formatDamage(entry.damage ?? 0)}）`
+                    : entry.kind === "attack"
                     ? ` 攻擊 ${entry.targetId}（${formatDamage(entry.damage ?? 0)}）`
                     : entry.kind === "move"
                       ? ` 移動至 ${entry.to ? `${entry.to.x},${entry.to.y}` : "?"}`
