@@ -19,8 +19,8 @@ export interface MockQueueSlot {
 export interface MockCombatEntry {
   id: string
   name: string
-  disabled: true
-  note: "戰鬥系統待 B6"
+  disabled: boolean
+  note: "B7 已接通"
 }
 
 export const MOCK_LORD = {
@@ -50,13 +50,13 @@ export const MOCK_RESOURCES: readonly MockResource[] = [
 ]
 
 export const MOCK_TROOPS = [
-  { name: "刀兵", count: "MOCK_1200" },
-  { name: "戟兵", count: "MOCK_800" },
-  { name: "弓兵", count: "MOCK_960" },
-  { name: "盾兵", count: "MOCK_640" },
-  { name: "騎兵", count: "MOCK_320" },
-  { name: "學者", count: "MOCK_40" },
-  { name: "神獸", count: "MOCK_1" },
+  { id: "blade", name: "刀兵", count: "MOCK_1200" },
+  { id: "halberd", name: "戟兵", count: "MOCK_800" },
+  { id: "bow", name: "弓兵", count: "MOCK_960" },
+  { id: "shield", name: "盾兵", count: "MOCK_640" },
+  { id: "cavalry", name: "騎兵", count: "MOCK_320" },
+  { id: "scholar", name: "學者", count: "MOCK_40" },
+  { id: "beast", name: "神獸", count: "MOCK_1" },
 ] as const
 
 /** Two building rows and one queued row. Third name and the non-example timers are assumed. */
@@ -67,9 +67,9 @@ export const MOCK_QUEUE: readonly MockQueueSlot[] = [
 ]
 
 export const MOCK_COMBAT_ENTRIES: readonly MockCombatEntry[] = [
-  { id: "combat_drill", name: "校場", disabled: true, note: "戰鬥系統待 B6" },
-  { id: "combat_muster", name: "點兵場", disabled: true, note: "戰鬥系統待 B6" },
-  { id: "action_arena", name: "競技", disabled: true, note: "戰鬥系統待 B6" },
+  { id: "combat_drill", name: "校場", disabled: false, note: "B7 已接通" },
+  { id: "combat_muster", name: "點兵場", disabled: false, note: "B7 已接通" },
+  { id: "action_arena", name: "競技", disabled: false, note: "B7 已接通" },
 ]
 
 export const MOCK_CHAT_TABS = [

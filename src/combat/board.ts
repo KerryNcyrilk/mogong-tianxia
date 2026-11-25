@@ -42,7 +42,7 @@ export interface BoardLog {
   turn: number
   side: Side
   unitId: string
-  kind: "move" | "attack" | "wait" | "auto" | "skill"
+  kind: "move" | "attack" | "wait" | "auto" | "skill" | "retreat"
   to?: { x: number; y: number }
   targetId?: string
   skillId?: string
@@ -57,6 +57,8 @@ export interface BoardState {
   acted: string[]
   log: BoardLog[]
   over: Side | null
+  /** B7 §2.3：主動撤退判負，戰後按 70% 回兵結算。 */
+  retreated?: boolean
 }
 
 export interface ApplyResult {
@@ -295,6 +297,19 @@ export function applyCommand(state: BoardState, command: Command): ApplyResult {
   next.acted.push(unit.id)
   next.log.push({ turn: next.turn, side: next.side, unitId: unit.id, kind: "wait" })
   return { state: checkOver(advance(next)), ok: true, reason: null }
+}
+
+/** B7 §2.3 撤退：本回合持方認負，士氣與經驗按敗仗結算，但不算全滅。 */
+export function retreat(state: BoardState): BoardState {
+  if (state.over) return state
+  const side = state.side
+  const winner: Side = side === "attacker" ? "defender" : "attacker"
+  return {
+    ...state,
+    over: winner,
+    retreated: true,
+    log: [...state.log, { turn: state.turn, side, unitId: "-", kind: "retreat" }],
+  }
 }
 
 function nearestEnemy(unit: BoardUnit, enemies: readonly BoardUnit[]): BoardUnit | null {

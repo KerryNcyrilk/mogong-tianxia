@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "stages.b7.v0.1",
+  "source": "spec/B7_可玩Demo整合規格_v0.1.md §2.2–2.4（Gemini B7-KICKOFF 20261125-1418）",
+  "grid": { "cols": 12, "rows": 8 },
+  "attacker": {
+    "positions": [
+      { "x": 1, "y": 2 },
+      { "x": 2, "y": 4 },
+      { "x": 1, "y": 6 }
+    ]
+  },
+  "stages": [
+    {
+      "id": "s_yecun",
+      "name": "野村",
+      "level": 1,
+      "note": "流寇盤踞，試刀第一戰",
+      "enemy": [
+        { "type": "blade", "count": 18, "x": 8, "y": 3 },
+        { "type": "bow", "count": 12, "x": 10, "y": 5 }
+      ]
+    },
+    {
+      "id": "s_shankou",
+      "name": "山口",
+      "level": 2,
+      "note": "扼守山道，弓騎混合",
+      "enemy": [
+        { "type": "halberd", "count": 24, "x": 7, "y": 2 },
+        { "type": "bow", "count": 16, "x": 10, "y": 3 },
+        { "type": "cavalry", "count": 10, "x": 9, "y": 6 }
+      ]
+    },
+    {
+      "id": "s_qinying",
+      "name": "秦營",
+      "level": 3,
+      "note": "秦軍前營，盾陣加神獸",
+      "enemy": [
+        { "type": "shield", "count": 30, "x": 7, "y": 4 },
+        { "type": "scholar", "count": 18, "x": 10, "y": 1 },
+        { "type": "beast", "count": 6, "x": 8, "y": 6 },
+        { "type": "bow", "count": 20, "x": 10, "y": 6 }
+      ]
+    }
+  ],
+  "settle": {
+    "winExpPerEnemy": 0.6,
+    "winCoinPerEnemy": 2,
+    "loseExpPerEnemy": 0.4,
+    "woundPctOnLose": 0.4,
+    "retreatKeepPct": 0.7,
+    "moraleWin": 5,
+    "moraleLose": -8
+  }
+}

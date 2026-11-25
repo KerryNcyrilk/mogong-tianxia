@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import screenSource from "../src/ui/city/CityScreen.tsx?raw"
 import leftPanelSource from "../src/ui/city/LeftPanel.tsx?raw"
 import zonesSource from "../src/ui/city/WorldHotZones.tsx?raw"
+import stageSource from "../src/ui/expedition/StageMap.tsx?raw"
 import { UI_1280, uiNode } from "../src/ui/city/tokens.ts"
 import { MOCK_GENERAL } from "../src/ui/city/mock.ts"
 
@@ -29,11 +30,11 @@ describe("B4 E3 五項存在性（靜態檢查，不啟動 React）", () => {
     }
   })
 
-  it("E3-4 出城真的切場景（OutsideScene + 40×40 圖塊佔位）", () => {
+  it("E3-4 出城真的切場景（B7 起改由 StageMap 承接 40×40 關卡點）", () => {
     const screen = screenSource
-    expect(screen).toMatch(/OutsideScene/)
-    expect(screen).toMatch(/40×40/)
-    expect(screen).toMatch(/大地圖（佔位）/)
+    expect(screen).toMatch(/StageMap/)
+    expect(screen).toMatch(/STAGE_FILE/)
+    expect(stageSource).toMatch(/大地圖 40×40/)
   })
 
   it("E3-5 熱區由 cityLayout 投影計算，且資訊卡 160×64", () => {

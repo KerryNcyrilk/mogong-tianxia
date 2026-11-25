@@ -7,6 +7,10 @@ import { GeneralPanel } from "./GeneralPanel.tsx"
 import { MOCK_CHAT_SEED, MOCK_CHAT_TABS } from "./mock.ts"
 import { artboardFrame, profileOf } from "./rects.ts"
 import { WorldHotZones } from "./WorldHotZones.tsx"
+import { HotspotOutline } from "./HotspotOutline.tsx"
+import { ExpeditionView } from "../expedition/ExpeditionView.tsx"
+import { RecruitPanel } from "../expedition/RecruitPanel.tsx"
+import { StageMap } from "../expedition/StageMap.tsx"
 import { CAMERA_DEFAULT_ZOOM, CAMERA_ZOOMS, STYLE, type UiProfile } from "./tokens.ts"
 import { INTERNAL_CONFIG } from "../../internal/config.ts"
 import { createState, enqueue, formatResource, load, moraleMultiplier, rollEvents, save, setTax, tick, taxRate } from "../../internal/engine.ts"
@@ -16,6 +20,7 @@ import {
   createRoster,
   equip as equipItem,
   expPct,
+  formationSummary,
   gainExp,
   load as loadRoster,
   recruit,
@@ -27,6 +32,8 @@ import {
   troopRows,
 } from "../../general/engine.ts"
 import type { RosterState } from "../../general/types.ts"
+import { STAGE_FILE, stageById } from "../../demo/stages.ts"
+import { recruitTroops } from "../../demo/recruit.ts"
 
 const TAX_ORDER: TaxRate["id"][] = ["low", "mid", "high"]
 
@@ -64,7 +71,11 @@ export function CityScreen() {
     chat_dm: "",
   })
   const [chats, setChats] = useState(emptyChats)
-  const [outside, setOutside] = useState(false)
+  const [mapOpen, setMapOpen] = useState(false)
+  const [stageId, setStageId] = useState<string | null>(null)
+  const [recruitUnit, setRecruitUnit] = useState<string | null>(null)
+  const [recruitNotice, setRecruitNotice] = useState("")
+  const [outlineOn, setOutlineOn] = useState(false)
   const [exploreOn, setExploreOn] = useState(false)
   const [intelOn, setIntelOn] = useState(false)
   const [log, setLog] = useState("MOCK_待命")
@@ -152,7 +163,30 @@ export function CityScreen() {
       setLog(`B6 武將面板 ${message.replace("MOCK_", "")}`)
       return
     }
+    if (message === "MOCK_校場" || message === "MOCK_出城") {
+      setMapOpen(true)
+      setLog("大地圖 選關卡")
+      return
+    }
+    if (message === "MOCK_點兵場" || message === "MOCK_徵兵") {
+      setRecruitUnit("")
+      setRecruitNotice("")
+      setLog("點兵場 徵兵")
+      return
+    }
+    if (message.startsWith("MOCK_徵兵:")) {
+      setRecruitUnit(message.slice("MOCK_徵兵:".length))
+      setRecruitNotice("")
+      return
+    }
     setLog(message)
+  }
+
+  function applySettlement(result: { roster: RosterState; internal: InternalState }) {
+    setRoster(result.roster)
+    saveRoster(result.roster)
+    setInternal(result.internal)
+    save(result.internal)
   }
 
   const profile: UiProfile = profileOf(size)
@@ -193,6 +227,12 @@ export function CityScreen() {
             {candidate === 1280 ? "1280×720" : "1920×1080"}
           </button>
         ))}
+        <button type="button" onClick={() => setOutlineOn((current) => !current)} style={chromeButton(outlineOn)}>
+          熱區
+        </button>
+        <button type="button" onClick={() => setMapOpen(true)} style={chromeButton(false)}>
+          出城
+        </button>
         {CAMERA_ZOOMS.map((step) => (
           <button key={step} type="button" onClick={() => setZoom(step)} style={chromeButton(zoom === step)}>
             {step.toFixed(1)}
@@ -212,10 +252,7 @@ export function CityScreen() {
           color: STYLE.text,
         }}
       >
-        {outside ? (
-          <OutsideScene profile={profile} />
-        ) : (
-          <>
+        <>
             <img
               src="/art/board/city-placeholder.svg"
               alt=""
@@ -229,7 +266,7 @@ export function CityScreen() {
                 pointerEvents: "none",
               }}
             />
-            <WorldHotZones profile={profile} zoom={zoom} onAction={setLog} />
+            <WorldHotZones profile={profile} zoom={zoom} onAction={leftAction} />
             <LeftPanel
               profile={profile}
               tab={tab}
@@ -240,7 +277,7 @@ export function CityScreen() {
               morale={Math.round(internal.morale)}
               taxLabel={rate.label}
               general={generalView}
-              troops={troopView}
+              troops={troopView.map((row, index) => ({ ...row, id: GENERAL_CONFIG.troops[index]?.id ?? "" }))}
             />
             <BottomBar
           profile={profile}
@@ -282,8 +319,7 @@ export function CityScreen() {
             setLog(message)
           }}
         />
-          </>
-        )}
+        </>
         {panel ? (
           <GeneralPanel
             roster={roster}
@@ -330,14 +366,59 @@ export function CityScreen() {
             }}
           />
         ) : null}
+        {outlineOn ? <HotspotOutline profile={profile} zoom={zoom} /> : null}
+        {mapOpen ? (
+          <StageMap
+            file={STAGE_FILE}
+            formation={formationSummary(roster, GENERAL_CONFIG)}
+            ready={roster.formation.some((slot) => slot.generalId)}
+            onPick={(id) => {
+              setMapOpen(false)
+              setStageId(id)
+            }}
+            onClose={() => setMapOpen(false)}
+          />
+        ) : null}
+        {stageId ? (
+          <ExpeditionView
+            stage={stageById(stageId) ?? STAGE_FILE.stages[0]}
+            file={STAGE_FILE}
+            roster={roster}
+            internal={internal}
+            onApply={applySettlement}
+            onClose={() => {
+              setStageId(null)
+              setLog("出征結束 回城")
+            }}
+            onLog={setLog}
+          />
+        ) : null}
+        {recruitUnit !== null ? (
+          <RecruitPanel
+            roster={roster}
+            internal={internal}
+            notice={recruitNotice}
+            onRecruit={(unit, amount) => {
+              const result = recruitTroops(roster, internal, GENERAL_CONFIG, INTERNAL_CONFIG, unit, amount)
+              if (!result.ok) {
+                setRecruitNotice(`徵兵失敗：${result.reason ?? "unknown"}`)
+                return
+              }
+              applySettlement({ roster: result.roster, internal: result.internal })
+              setRecruitNotice(`已徵 ${result.added} 兵`)
+              setLog(`徵兵 ${unit} +${result.added ?? 0}`)
+            }}
+            onClose={() => setRecruitUnit(null)}
+          />
+        ) : null}
         <CornerButtons
           profile={profile}
-          outside={outside}
+          outside={mapOpen}
           exploreOn={exploreOn}
           intelOn={intelOn}
           onToggleExit={() => {
-            setOutside((current) => !current)
-            setLog(outside ? "MOCK_回城" : "MOCK_出城")
+            setMapOpen((current) => !current)
+            setLog(mapOpen ? "MOCK_回城" : "MOCK_出城")
           }}
           onExplore={() => {
             setExploreOn((current) => !current)
@@ -349,61 +430,6 @@ export function CityScreen() {
           }}
         />
       </div>
-    </div>
-  )
-}
-
-function OutsideScene({ profile }: { profile: UiProfile }) {
-  const tiles = ["墨城", "野村", "山口"] as const
-  return (
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        width: profile.screenW,
-        height: profile.screenH,
-        background: STYLE.grass,
-        backgroundImage: `linear-gradient(to right, ${STYLE.queued} 1px, transparent 1px), linear-gradient(to bottom, ${STYLE.queued} 1px, transparent 1px)`,
-        backgroundSize: "40px 40px",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          left: profile.safe.x + 12,
-          top: 12,
-          padding: "6px 12px",
-          background: STYLE.panel,
-          color: STYLE.text,
-          boxShadow: `inset 0 0 0 2px ${STYLE.border}, inset 0 0 0 3px ${STYLE.gold}`,
-          fontFamily: STYLE.fontTitle,
-          fontSize: 12,
-        }}
-      >
-        大地圖（佔位）｜40×40 圖塊｜不接移動與戰鬥
-      </div>
-      {tiles.map((name, index) => (
-        <div
-          key={name}
-          style={{
-            position: "absolute",
-            left: profile.safe.x + 60 + index * 200,
-            top: 240 + (index % 2) * 80,
-            width: 80,
-            height: 80,
-            display: "grid",
-            placeItems: "center",
-            background: STYLE.panelRaise,
-            color: STYLE.text,
-            boxShadow: `inset 0 0 0 2px ${STYLE.border}, inset 0 0 0 3px ${STYLE.gold}`,
-            fontFamily: STYLE.fontTitle,
-            fontSize: 12,
-          }}
-        >
-          {name}
-        </div>
-      ))}
     </div>
   )
 }

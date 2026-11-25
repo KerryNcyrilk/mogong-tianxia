@@ -8,6 +8,7 @@ import {
   autoTurn,
   createBoard,
   reachable,
+  retreat,
   type BoardState,
   type BoardUnit,
 } from "../combat/board.ts"
@@ -85,11 +86,13 @@ const REASON_TEXT: Record<string, string> = {
   "not-your-turn": "未到這支部隊行動。",
   "out-of-range": "目標不在射程內。",
   blocked: "這一步走不過去（超出移動力或被擋）。",
+  "no-skill": "這支部隊沒有這個技能。",
+  cooling: "技能尚在冷卻。",
 }
 
-/** B2 手動棋盤：一格一步移動／攻擊／待機，另有託管切換。 */
-function ManualBoard() {
-  const [board, setBoard] = useState<BoardState>(() => boardWithGeneral())
+/** B2 手動棋盤：一格一步移動／攻擊／待機，另有託管切換。B7 出征時由外部傳入 Squad[] 與結算回呼。 */
+function ManualBoard({ squads, onFinish }: { squads?: readonly Squad[]; onFinish?: (board: BoardState) => void } = {}) {
+  const [board, setBoard] = useState<BoardState>(() => (squads ? createBoard(squads) : boardWithGeneral()))
   const [selected, setSelected] = useState<string | null>(null)
   const [notice, setNotice] = useState("")
   const [skillMode, setSkillMode] = useState<string | null>(null)
@@ -102,7 +105,7 @@ function ManualBoard() {
     return () => window.clearInterval(timer)
   }, [board.auto, board.over])
 
-  const squads = useMemo(() => board.units.map(toSquad), [board])
+  const squadList = useMemo(() => board.units.map(toSquad), [board])
   const mine = board.units.find((unit) => unit.id === selected && unit.hp > 0)
   const actor = mine ?? board.units.find((unit) => unit.id === activeUnitId(board) && unit.hp > 0)
   const moveCells = useMemo(() => {
@@ -170,7 +173,7 @@ function ManualBoard() {
   }
 
   const status = board.over
-    ? `戰畢：${board.over === "attacker" ? "墨方勝" : "秦方勝"}`
+    ? `戰畢：${board.retreated ? "已撤退" : board.over === "attacker" ? "墨方勝" : "秦方勝"}`
     : `第 ${board.turn} 回合　${board.side === "attacker" ? "墨方" : "秦方"}行動　${board.auto ? "託管中" : "手動"}`
 
   return (
@@ -185,7 +188,7 @@ function ManualBoard() {
         </div>
         <CanvasBoundary>
           <BattleCanvas
-            squads={squads}
+            squads={squadList}
             highlightId={selected}
             onCellClick={onCellClick}
             moveCells={moveCells}
@@ -232,10 +235,35 @@ function ManualBoard() {
           >
             待機
           </button>
+          {onFinish ? (
+            <button
+              type="button"
+              data-ui-id="board-retreat"
+              onClick={() => {
+                setBoard((current) => retreat(current))
+                setSelected(null)
+                setSkillMode(null)
+              }}
+              className="h-8 rounded-sm border border-[#7c312c] px-3 text-[#7c312c]"
+              disabled={board.auto || Boolean(board.over)}
+            >
+              撤退
+            </button>
+          ) : null}
+          {onFinish && board.over ? (
+            <button
+              type="button"
+              data-ui-id="board-settle"
+              onClick={() => onFinish(board)}
+              className="h-8 rounded-sm border border-[#7c312c] bg-[#1b1712] px-3 text-[#f6efe2]"
+            >
+              結束戰鬥・回城結算
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => {
-              setBoard(boardWithGeneral())
+              setBoard(squads ? createBoard(squads) : boardWithGeneral())
               setSelected(null)
               setNotice("")
             }}
@@ -283,7 +311,9 @@ function ManualBoard() {
                       ? ` 移動至 ${entry.to ? `${entry.to.x},${entry.to.y}` : "?"}`
                       : entry.kind === "wait"
                         ? " 待機"
-                        : " 切換託管"}
+                        : entry.kind === "retreat"
+                          ? " 撤退"
+                          : " 切換託管"}
                 </li>
               ))}
             </ol>
@@ -292,6 +322,11 @@ function ManualBoard() {
       </aside>
     </div>
   )
+}
+
+/** B7：出征用棋盤，戰畢回呼把棋盤交給結算。 */
+export function ExpeditionBoard({ squads, onFinish }: { squads: readonly Squad[]; onFinish: (board: BoardState) => void }) {
+  return <ManualBoard squads={squads} onFinish={onFinish} />
 }
 
 export function BattleView() {

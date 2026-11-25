@@ -1,0 +1,16 @@
+# B7 紅線零改自證
+
+基準 commit：5463652（cursor/b6-general）
+
+## git diff --stat 對紅線檔
+```
+(以上為空即零改)
+```
+
+## blob hash 對比（工作區 vs HEAD）
+```
+data/cityLayout.json  HEAD=107ede42864ef0c5551ebb5a61436b896f49d391  WORKTREE=107ede42864ef0c5551ebb5a61436b896f49d391
+data/units.json  HEAD=50b37116071526c44fedde91af63f3b52c4e500f  WORKTREE=50b37116071526c44fedde91af63f3b52c4e500f
+```
+
+檢查時間：2026-11-25T18:01:34+08:00
