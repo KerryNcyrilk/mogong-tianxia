@@ -1,0 +1,8 @@
+{
+  "schema": "board.b2.v0.1",
+  "source": "spec/B2_手動棋盤戰棋規格_v0.1.md §4（Gemini B2-KICKOFF 拍板：全平地、無 LOS、曼哈頓射程）",
+  "grid": { "cols": 12, "rows": 8 },
+  "move": { "blade": 3, "halberd": 2, "bow": 2, "shield": 2, "cavalry": 4, "scholar": 2, "beast": 3 },
+  "waitBonusMove": 1,
+  "auto": { "defaultEnabled": false, "targetRule": "lowest-hp-in-range-else-nearest" }
+}

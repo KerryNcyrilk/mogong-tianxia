@@ -1,0 +1,1 @@
+check-no-syslog: PASS (13 js files, 0 hits of sysLog. / SYSLOG_EXPORT / exportText / snapshot()
