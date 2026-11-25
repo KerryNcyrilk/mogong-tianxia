@@ -1,0 +1,7 @@
+areas: 4 (276+391+455+158=1280) gaps: 0
+style: PASS (alpha 1.00, border 2px/1px)
+scale: PASS (710 values, 1920 = 1280*1.5)
+safe: PASS (gov/drill/gate_s inside, ui∩subject=0)
+camera: PASS (4 zooms, ui fixed)
+typography: PASS (min 10/12px, hit 32, ring 44)
+combat-live: PASS (3 entries live, city→combat 0, expedition→board 1)

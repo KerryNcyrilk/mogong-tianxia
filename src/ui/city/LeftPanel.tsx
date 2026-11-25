@@ -35,7 +35,7 @@ export function LeftPanel({
   morale?: number
   taxLabel?: string
   general?: { name: string; level: number; expPct: number; stat: string; status: string } | null
-  troops?: readonly { name: string; count: number | string }[]
+  troops?: readonly { id?: string; name: string; count: number | string }[]
 }) {
   const generalView = general ?? MOCK_GENERAL
   const troopRows = troops?.length ? troops : MOCK_TROOPS
@@ -244,10 +244,19 @@ export function LeftPanel({
           <div
             key={troop.name}
             data-ui-id={row.id}
+            data-troop-id={troop.id}
+            role="button"
+            tabIndex={0}
+            title={`${troop.name} 徵兵`}
+            onClick={() => onAction(`MOCK_徵兵:${troop.id ?? ""}`)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") onAction(`MOCK_徵兵:${troop.id ?? ""}`)
+            }}
             style={{
               ...place(row, panel),
               background: tab === "troops" ? STYLE.panelRaise : STYLE.panel,
               boxShadow: `inset 0 -1px 0 ${STYLE.border}`,
+              cursor: "pointer",
             }}
           >
             <span

@@ -17,6 +17,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url))
 const cityDir = resolve(here, "../src/ui/city")
+const expeditionDir = resolve(here, "../src/ui/expedition")
 const ALLOWED_HEX = new Set([
   "#2B1F17",
   "#3A2A1C",
@@ -228,41 +229,49 @@ function typographyLine() {
   return { pass, line: `typography: ${pass ? "PASS" : "FAIL"} (min 10/12px, hit 32, ring 44)` }
 }
 
-function importCount(files) {
+function importSpecs(files) {
+  const specs = []
   const patterns = [
     /import\s+[^'"\n]*from\s+["']([^"']+)["']/g,
     /import\s*["']([^"']+)["']/g,
     /import\s*\(\s*["']([^"']+)["']\s*\)/g,
     /export\s+[^'"\n]*from\s+["']([^"']+)["']/g,
   ]
-  let count = 0
   for (const file of files) {
     const text = readFileSync(file, "utf8")
     for (const pattern of patterns) {
       for (const match of text.matchAll(pattern)) {
         const spec = match[1]
-        const resolved = spec.startsWith(".") ? resolve(dirname(file), spec).replaceAll("\\", "/") : spec
-        if (resolved.includes("/src/combat/") || resolved.endsWith("/BattleView.tsx") || resolved.endsWith("/BattleView.ts")) {
-          count += 1
-        }
+        specs.push(spec.startsWith(".") ? resolve(dirname(file), spec).replaceAll("\\", "/") : spec)
       }
     }
   }
-  return count
+  return specs
 }
 
+/** B7 起戰鬥解凍：校場／點兵場／競技不再 disabled，但 city 目錄仍不得直連 combat（一律經 expedition）。 */
 function combatLine(files) {
-  const disabled = MOCK_COMBAT_ENTRIES.filter((entry) => entry.disabled && entry.note === "戰鬥系統待 B6")
+  const live = MOCK_COMBAT_ENTRIES.filter((entry) => entry.disabled === false && entry.note === "B7 已接通")
   const tsx = files
     .filter((file) => file.endsWith(".tsx"))
     .map((file) => readFileSync(file, "utf8"))
     .join("\n")
   const namesOk = ["校場", "點兵場", "競技"].every((name) => tsx.includes(name))
-  const phraseCount = tsx.split("戰鬥系統待 B6").length - 1
-  const disabledCount = (tsx.match(/\bdisabled\b/g) ?? []).length
-  const imports = importCount(files)
-  const pass = disabled.length === 3 && namesOk && phraseCount >= 3 && disabledCount >= 3 && imports === 0
-  return { pass, line: `combat-frozen: ${pass ? "PASS" : "FAIL"} (${disabled.length} entries disabled, imports ${imports})` }
+  const phraseCount = tsx.split("B7 已接通").length - 1
+  const imports = importSpecs(files).filter(
+    (spec) => spec.includes("/src/combat/") || spec.endsWith("/BattleView.tsx") || spec.endsWith("/BattleView.ts"),
+  ).length
+  const expedition = walk(expeditionDir)
+  const boardImports = importSpecs(expedition).filter((spec) => spec.endsWith("/src/combat/board.ts")).length
+  const hasView = expedition.some((file) => file.endsWith("ExpeditionView.tsx"))
+  const hasStage = expedition.some((file) => file.endsWith("StageMap.tsx"))
+  const expeditionEntry = tsx.includes("出征")
+  const pass =
+    live.length === 3 && namesOk && phraseCount >= 2 && expeditionEntry && imports === 0 && boardImports >= 1 && hasView && hasStage
+  return {
+    pass,
+    line: `combat-live: ${pass ? "PASS" : "FAIL"} (${live.length} entries live, city→combat ${imports}, expedition→board ${boardImports})`,
+  }
 }
 
 const files = walk(cityDir)

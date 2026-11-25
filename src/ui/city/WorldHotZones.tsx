@@ -14,8 +14,8 @@ import { ART_ORIGIN, STYLE, type UiProfile } from "./tokens.ts"
 const LAYOUT = loadCityLayout(JSON.stringify(cityLayoutJson))
 
 const HOT_ZONES = [
-  { id: "drill", name: "校場", note: "戰鬥系統待 B6" },
-  { id: "barrack", name: "點兵場", note: "戰鬥系統待 B6" },
+  { id: "drill", name: "校場", note: "B7 已接通・出征" },
+  { id: "barrack", name: "點兵場", note: "B7 已接通・徵兵" },
 ] as const
 
 const CARD = { w: 160, h: 64 } as const
@@ -100,23 +100,27 @@ export function WorldHotZones({
                 <p style={{ margin: "2px 0 0", fontSize: 10, color: STYLE.textMuted }}>{zone.note}</p>
                 <button
                   type="button"
-                  disabled
+                  data-ui-id={`zone-enter-${zone.id}`}
                   title={`${zone.name} ${zone.note}`}
+                  onClick={() => {
+                    setActive(null)
+                    onAction(`MOCK_${zone.name}`)
+                  }}
                   style={{
                     position: "absolute",
                     left: 6,
                     bottom: 6,
                     width: 40,
-                    height: 18,
+                    height: 20,
                     padding: 0,
                     border: 0,
-                    background: STYLE.queued,
-                    color: STYLE.textMuted,
-                    boxShadow: `inset 0 0 0 1px ${STYLE.gold}`,
+                    background: STYLE.gold,
+                    color: STYLE.border,
+                    boxShadow: `inset 0 0 0 1px ${STYLE.border}`,
                     fontFamily: STYLE.fontValue,
                     fontSize: 10,
                     lineHeight: 1,
-                    cursor: "not-allowed",
+                    cursor: "pointer",
                   }}
                 >
                   進入

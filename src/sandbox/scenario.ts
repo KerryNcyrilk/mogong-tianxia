@@ -1,6 +1,6 @@
 import type { General, Squad, UnitType } from "../combat/types.ts"
 
-interface CatalogRow {
+export interface SandboxUnitRow {
   atk: number
   def: number
   hpPer: number
@@ -12,7 +12,7 @@ interface CatalogRow {
  * Sandbox roster numbers. These are the pre-v4 lineup the grid view already
  * shipped with. The official table is data/units.json and is not read here.
  */
-const SANDBOX_UNITS: Record<UnitType, CatalogRow> = {
+export const SANDBOX_UNITS: Record<UnitType, SandboxUnitRow> = {
   cavalry: { atk: 14, def: 8, hpPer: 12, range: 1, move: 3 },
   blade: { atk: 10, def: 8, hpPer: 10, range: 1, move: 2 },
   beast: { atk: 16, def: 12, hpPer: 40, range: 1, move: 2 },
