@@ -251,7 +251,7 @@ function baselineNodes(): UiNode[] {
     { id: "monarch_name", label: "君主名", x: 92, y: 12, w: 120, h: 26, group: "left", fontRole: "body", fontSize: 22 },
     { id: "prestige", label: "聲望", x: 92, y: 40, w: 78, h: 18, group: "left", fontRole: "value", fontSize: 12 },
     { id: "peerage", label: "爵位", x: 92, y: 60, w: 100, h: 18, group: "left", fontRole: "body", fontSize: 12 },
-    { id: "alliance", label: "聯盟", x: 92, y: 80, w: 100, h: 10, group: "left", fontRole: "body", fontSize: 10 },
+    { id: "alliance", label: "聯盟", x: 196, y: 62, w: 68, h: 16, group: "left", fontRole: "body", fontSize: 10 },
     { id: "treasury", label: "寶庫", x: 196, y: 10, w: 36, h: 26, group: "left", fontRole: "body", fontSize: 10 },
     { id: "treasury_hit", label: "寶庫點擊", x: 196, y: 8, w: 36, h: 32, group: "left", hit: "control" },
     { id: "mail", label: "信件", x: 238, y: 10, w: 30, h: 26, group: "left", fontRole: "body", fontSize: 10 },

@@ -20,12 +20,18 @@ export function LeftPanel({
   log,
   onTab,
   onAction,
+  resources,
+  morale,
+  taxLabel,
 }: {
   profile: UiProfile
   tab: "general" | "troops"
   log: string
   onTab: (next: "general" | "troops") => void
   onAction: (message: string) => void
+  resources?: Record<string, { value: string; yieldText: string }>
+  morale?: number
+  taxLabel?: string
 }) {
   const panel = uiNode(profile, "area_left")
   const avatar = uiNode(profile, "avatar")
@@ -133,14 +139,14 @@ export function LeftPanel({
           <div key={resource.id}>
             <div
               data-ui-id={resource.id}
-              title={resource.name}
+              title={`${resource.name}${taxLabel && resource.id === "res_coin" ? ` 稅${taxLabel}` : ""}`}
               style={{ ...place(row, panel), background: index % 2 === 0 ? STYLE.panel : STYLE.panelRaise }}
             />
             <div style={place(icon, panel)}>
               <Glyph name={resource.name} />
             </div>
             <p style={{ ...place(value, panel), ...textFace(value, "value"), display: "flex", alignItems: "center" }}>
-              {resource.value}
+              {resources?.[resource.id]?.value ?? resource.value}
             </p>
             <p
               style={{
@@ -152,13 +158,13 @@ export function LeftPanel({
                 whiteSpace: "nowrap",
               }}
             >
-              {resource.yieldText}
+              {resources?.[resource.id]?.yieldText ?? resource.yieldText}
             </p>
             <FaceButton
               origin={panel}
               face={uiNode(profile, `${resource.id}_plus`)}
               hit={controlNode(profile, `${resource.id}_plus`)}
-              title={`${resource.name} 加`}
+              title={resource.id === "res_coin" ? `${resource.name} 加／切稅率` : `${resource.name} 加`}
               onClick={() => onAction(`MOCK_加${resource.name}`)}
             >
               +
@@ -203,6 +209,7 @@ export function LeftPanel({
         </div>
         <p style={{ ...place(generalStatus, card), ...textFace(generalStatus, "title"), display: "flex", alignItems: "center" }}>
           狀態：{MOCK_GENERAL.status}
+          {morale !== undefined ? `　民心 ${morale}` : ""}
         </p>
         <FaceButton
           origin={card}

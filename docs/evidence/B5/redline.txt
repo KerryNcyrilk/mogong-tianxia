@@ -1,0 +1,22 @@
+# B5 紅線自證（base c77c4d0 → HEAD）
+
+## cityLayout.json md5
+e380c3abaea0e451008b2c03fcd5ae13  data/cityLayout.json
+
+## 紅線三檔 diff 行數（0 = 零改動）
+data/cityLayout.json src/combat data/units.json → 0 行（工作區未提交，基線為 c77c4d0）
+
+## git status 摘要
+ M package-lock.json
+ M "spec/B5_\345\205\247\346\224\277\345\276\252\347\222\260\350\246\217\346\240\274_v0.1.md"
+ M src/dev/syslog/types.ts
+ M src/ui/city/BottomBar.tsx
+ M src/ui/city/CityScreen.tsx
+ M src/ui/city/LeftPanel.tsx
+ M src/ui/city/mock.ts
+ M src/ui/city/tokens.ts
+?? data/internal.json
+?? docs/evidence/B5/
+?? "spec/B2_\346\211\213\345\213\225\346\243\213\347\233\244\346\210\260\346\243\213\350\246\217\346\240\274_v0.1.md"
+?? src/internal/
+?? tests/internal.test.ts
