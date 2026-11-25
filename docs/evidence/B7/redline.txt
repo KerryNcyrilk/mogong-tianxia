@@ -14,3 +14,8 @@ data/units.json  HEAD=50b37116071526c44fedde91af63f3b52c4e500f  WORKTREE=50b3711
 ```
 
 檢查時間：2026-11-25T18:01:34+08:00
+
+## 合併 main 後重跑（base 含 78cca40／fcd905c）
+- 時間：2026-11-25T18:03:39+08:00；分支 tip：8e5edf9
+- vitest 124 passed、city-check 5 PASS、ui-check 7 PASS、build 成功、scan 0 hits（見同目錄 txt）
+- 本地已驗證 cursor/b7-playable-demo → main 三方合併零衝突
