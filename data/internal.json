@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "tickSeconds": 1,
+  "morale": { "start": 70, "min": 0, "max": 100, "lowPenalty": 0.8, "highBonus": 1.1, "lowGate": 30, "highGate": 90 },
+  "tax": {
+    "rates": [
+      { "id": "low", "label": "低", "tax": 0.1, "moralePerHour": 1 },
+      { "id": "mid", "label": "中", "tax": 0.2, "moralePerHour": -1 },
+      { "id": "high", "label": "高", "tax": 0.3, "moralePerHour": -3 }
+    ],
+    "default": "mid"
+  },
+  "newbieProtectHours": 24,
+  "resources": [
+    { "id": "res_pop", "key": "pop", "name": "人口", "rate": 12, "cap": { "base": 0, "unit": 50, "levels": 10 }, "taxable": false },
+    { "id": "res_jade", "key": "jade", "name": "玉石", "rate": 1, "cap": { "base": 0, "unit": 1, "levels": 9999 }, "taxable": false },
+    { "id": "res_coin", "key": "coin", "name": "刀幣", "rate": 360, "cap": null, "taxable": true },
+    { "id": "res_food", "key": "food", "name": "糧食", "rate": 480, "cap": { "base": 2, "unit": 900, "levels": 70 }, "taxable": false },
+    { "id": "res_wood", "key": "wood", "name": "木材", "rate": 480, "cap": { "base": 2, "unit": 900, "levels": 70 }, "taxable": false },
+    { "id": "res_iron", "key": "iron", "name": "生鐵", "rate": 240, "cap": { "base": 2, "unit": 900, "levels": 70 }, "taxable": false },
+    { "id": "res_stone", "key": "stone", "name": "石頭", "rate": 240, "cap": { "base": 2, "unit": 900, "levels": 70 }, "taxable": false }
+  ],
+  "start": { "pop": 320, "jade": 112, "coin": 245608, "food": 51298, "wood": 51298, "iron": 51298, "stone": 51298 },
+  "queue": { "slots": 3 },
+  "buildings": [
+    { "kind": "gov", "label": "官府", "seconds": 300, "cost": { "coin": 8000, "wood": 900, "stone": 600 } },
+    { "kind": "house", "label": "民居", "seconds": 120, "cost": { "coin": 1200, "wood": 300 } },
+    { "kind": "farm", "label": "農田", "seconds": 90, "cost": { "coin": 900, "wood": 200 } },
+    { "kind": "barrack", "label": "軍營", "seconds": 240, "cost": { "coin": 3000, "wood": 500, "stone": 300 } },
+    { "kind": "drill", "label": "校場", "seconds": 240, "cost": { "coin": 3000, "wood": 500, "stone": 300 } },
+    { "kind": "market", "label": "市集", "seconds": 150, "cost": { "coin": 2000, "wood": 400 } }
+  ],
+  "refundPct": 0.7,
+  "events": [
+    { "id": "harvest", "label": "豐收", "perHour": 0.04, "effect": { "foodPct": 0.15 } },
+    { "id": "fire", "label": "火災", "perHour": 0.015, "effect": { "levelDown": 1 } },
+    { "id": "refugee", "label": "流民", "perHour": 0.03, "effect": { "pop": 50, "coin": -2000 } }
+  ]
+}

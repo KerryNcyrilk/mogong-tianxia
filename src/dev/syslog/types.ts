@@ -3,7 +3,7 @@
 export const LEVELS = ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"] as const
 export type Level = (typeof LEVELS)[number]
 
-export const CHANNELS = ["boot", "combat", "city", "ui", "asset", "save", "perf"] as const
+export const CHANNELS = ["boot", "combat", "city", "ui", "asset", "save", "perf", "internal"] as const
 export type Channel = (typeof CHANNELS)[number]
 
 /** JSON-safe only: number / string / boolean / null / array / plain object. */

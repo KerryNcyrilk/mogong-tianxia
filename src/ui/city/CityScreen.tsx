@@ -7,6 +7,11 @@ import { MOCK_CHAT_SEED, MOCK_CHAT_TABS } from "./mock.ts"
 import { artboardFrame, profileOf } from "./rects.ts"
 import { WorldHotZones } from "./WorldHotZones.tsx"
 import { CAMERA_DEFAULT_ZOOM, CAMERA_ZOOMS, STYLE, type UiProfile } from "./tokens.ts"
+import { INTERNAL_CONFIG } from "../../internal/config.ts"
+import { createState, enqueue, formatResource, load, moraleMultiplier, rollEvents, save, setTax, tick, taxRate } from "../../internal/engine.ts"
+import type { InternalState, TaxRate } from "../../internal/types.ts"
+
+const TAX_ORDER: TaxRate["id"][] = ["low", "mid", "high"]
 
 type ChatId = (typeof MOCK_CHAT_TABS)[number]["id"]
 
@@ -47,6 +52,47 @@ export function CityScreen() {
   const [intelOn, setIntelOn] = useState(false)
   const [log, setLog] = useState("MOCK_待命")
   const [elapsed, setElapsed] = useState(0)
+  const [internal, setInternal] = useState<InternalState>(() => load(INTERNAL_CONFIG) ?? createState(INTERNAL_CONFIG))
+
+  useEffect(() => {
+    let ticks = 0
+    const timer = window.setInterval(() => {
+      setInternal((current) => {
+        let next = tick(current, INTERNAL_CONFIG, INTERNAL_CONFIG.tickSeconds)
+        ticks += 1
+        if (ticks % 60 === 0) {
+          const rolled = rollEvents(next, INTERNAL_CONFIG, 1)
+          next = rolled.state
+          if (__SYSLOG__) {
+            for (const event of rolled.events) sysLog.warn("internal", "internal.event.fire", event)
+            sysLog.info("internal", "internal.tick", { clock: next.clock, morale: next.morale, tax: next.tax })
+          }
+        }
+        if (ticks % 15 === 0) save(next)
+        return next
+      })
+    }, 1000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  const rate = taxRate(internal, INTERNAL_CONFIG)
+  const resourceView: Record<string, { value: string; yieldText: string }> = {}
+  for (const def of INTERNAL_CONFIG.resources) {
+    const cap = def.cap ? def.cap.base + def.cap.unit * (internal.levels[def.key] ?? def.cap.levels) : null
+    const raw = Math.floor(internal.resources[def.key])
+    const shown = formatResource(internal, INTERNAL_CONFIG, def.key).replace(`/${cap} 滿`, "")
+    resourceView[def.id] = {
+      value: shown,
+      yieldText: `${cap !== null && raw >= cap ? "滿" : `+${Math.round(def.rate * moraleMultiplier(internal, INTERNAL_CONFIG) * (def.taxable ? rate.tax * 5 : 1))}/時`}`,
+    }
+  }
+  const queueView = internal.slots.map((slot, index) => ({
+    id: `queue_${["farm", "storage", "wait"][index] ?? index}`,
+    name: slot.kind ? slot.label : "待建",
+    level: slot.kind ? slot.levelAtStart + 1 : 0,
+    seconds: Math.floor(slot.remaining),
+    status: (slot.status === "queued" ? "queued" : "building") as "building" | "queued",
+  }))
 
   useEffect(() => {
     if (__SYSLOG__) sysLog.info("city", "camera.move", { zoom, size })
@@ -135,20 +181,50 @@ export function CityScreen() {
               }}
             />
             <WorldHotZones profile={profile} zoom={zoom} onAction={setLog} />
-            <LeftPanel profile={profile} tab={tab} log={log} onTab={setTab} onAction={setLog} />
+            <LeftPanel
+              profile={profile}
+              tab={tab}
+              log={log}
+              onTab={setTab}
+              onAction={setLog}
+              resources={resourceView}
+              morale={Math.round(internal.morale)}
+              taxLabel={rate.label}
+            />
             <BottomBar
           profile={profile}
           chatTab={chatTab}
           messages={chats[chatTab]}
           draft={drafts[chatTab]}
           elapsed={elapsed}
+          queueSlots={queueView}
           onChatTab={(id) => {
             setChatTab(id as ChatId)
             setLog(`MOCK_聊天${MOCK_CHAT_TABS.find((item) => item.id === id)?.label ?? ""}`)
           }}
           onDraft={(value) => setDrafts((current) => ({ ...current, [chatTab]: value }))}
           onSend={sendChat}
-          onAction={setLog}
+          onAction={(message) => {
+            if (message === "MOCK_建築") {
+              const result = enqueue(internal, INTERNAL_CONFIG, "house")
+              if (result.ok) {
+                setInternal(result.state)
+                setLog("內政 民居已入隊")
+                if (__SYSLOG__) sysLog.info("internal", "internal.queue.change", { kind: "house", action: "enqueue" })
+              } else {
+                setLog(`內政 建造失敗：${result.reason ?? "unknown"}`)
+              }
+              return
+            }
+            if (message.startsWith("MOCK_加刀幣")) {
+              const index = TAX_ORDER.indexOf(internal.tax)
+              const next = TAX_ORDER[(index + 1) % TAX_ORDER.length]
+              setInternal((current) => setTax(current, next))
+              setLog(`內政 稅率切至 ${INTERNAL_CONFIG.tax.rates.find((item) => item.id === next)?.label ?? next}`)
+              return
+            }
+            setLog(message)
+          }}
         />
           </>
         )}

@@ -22,6 +22,7 @@ export function BottomBar({
   messages,
   draft,
   elapsed,
+  queueSlots,
   onChatTab,
   onDraft,
   onSend,
@@ -32,6 +33,7 @@ export function BottomBar({
   messages: readonly string[]
   draft: string
   elapsed: number
+  queueSlots?: readonly MockQueueSlot[]
   onChatTab: (id: string) => void
   onDraft: (value: string) => void
   onSend: () => void
@@ -99,28 +101,22 @@ export function BottomBar({
               origin={actions}
               face={uiNode(profile, action.id)}
               disabled={frozen}
-              stacked={frozen}
+              stacked={false}
               background={shop ? STYLE.cinnabar : STYLE.panelRaise}
               title={frozen ? "競技 戰鬥系統待 B6" : action.label}
+              aria-label={frozen ? "競技 戰鬥系統待 B6" : action.label}
               onClick={() => {
                 if (__SYSLOG__) sysLog.info("ui", "button.click", { control: action.id })
                 onAction(`MOCK_${action.label}`)
               }}
             >
-              {frozen ? (
-                <>
-                  <span>競技</span>
-                  <span>戰鬥系統待 B6</span>
-                </>
-              ) : (
-                action.label
-              )}
+              {action.label}
             </FaceButton>
           )
         })}
       </Panel>
       <Panel node={queue} profile={profile}>
-        {MOCK_QUEUE.map((slot, index) => {
+        {(queueSlots && queueSlots.length ? queueSlots : MOCK_QUEUE).map((slot, index) => {
           const row = uiNode(profile, slot.id)
           const bar = uiNode(profile, `${slot.id}_bar`)
           const name = uiNode(profile, `${slot.id}_name`)

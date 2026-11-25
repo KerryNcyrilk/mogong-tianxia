@@ -104,5 +104,5 @@ export function formatHMS(totalSeconds: number): string {
 }
 
 export function queueTitle(slot: MockQueueSlot): string {
-  return `${slot.name} ${slot.level}級`
+  return slot.level > 0 ? `${slot.name} ${slot.level}級` : slot.name
 }
