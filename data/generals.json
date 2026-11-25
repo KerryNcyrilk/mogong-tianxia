@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "generals.v1.0",
+  "source": "B6 武將與成長系統（Gemini 20261125-1303 KICKOFF，豆包實作）",
+  "level": { "max": 60, "expBase": 100, "expGrow": 1.35, "perLevel": { "atk": 3, "def": 2, "lead": 1 } },
+  "lead": { "capBase": 600, "capPer": 120 },
+  "archetypes": [
+    { "id": "brawler", "label": "猛將", "atk": 18, "def": 10, "lead": 6 },
+    { "id": "strategist", "label": "智將", "atk": 12, "def": 12, "lead": 10 },
+    { "id": "commander", "label": "統帥", "atk": 10, "def": 16, "lead": 14 },
+    { "id": "scholar", "label": "儒將", "atk": 8, "def": 8, "lead": 16 }
+  ],
+  "tavern": { "slots": 3, "refreshHours": 24, "cost": { "coin": 2000, "jade": 1 } },
+  "pool": [
+    { "id": "g_mozi", "name": "墨翟", "archetype": "commander", "skills": ["sk_sishou", "sk_bingfa"], "leitmotif": "墨門之主，守城第一" },
+    { "id": "g_qinwuyang", "name": "禽滑釐", "archetype": "strategist", "skills": ["sk_huoji"], "leitmotif": "善用火攻的墨家弟子" },
+    { "id": "g_mengsheng", "name": "孟勝", "archetype": "brawler", "skills": ["sk_tuji"], "leitmotif": "巨子傳人，陣前先登" },
+    { "id": "g_tianxiang", "name": "田襄子", "archetype": "scholar", "skills": ["sk_bingfa"], "leitmotif": "治軍以法，糧秣不絕" },
+    { "id": "g_suiyuan", "name": "隨緣", "archetype": "strategist", "skills": ["sk_huoji", "sk_bingfa"], "leitmotif": "行蹤不定的說客" },
+    { "id": "g_gaoshi", "name": "高石子", "archetype": "commander", "skills": ["sk_sishou", "sk_tuji"], "leitmotif": "守土有責的老將" }
+  ],
+  "equipment": {
+    "slots": ["weapon", "armor", "horse"],
+    "items": [
+      { "id": "eq_qinglong", "name": "青龍刀", "slot": "weapon", "atk": 12, "def": 0, "lead": 0 },
+      { "id": "eq_tiejia", "name": "鐵甲", "slot": "armor", "atk": 0, "def": 14, "lead": 0 },
+      { "id": "eq_dilu", "name": "的盧", "slot": "horse", "atk": 0, "def": 0, "lead": 6 },
+      { "id": "eq_jiaogong", "name": "角弓", "slot": "weapon", "atk": 9, "def": 0, "lead": 2 },
+      { "id": "eq_pidun", "name": "皮盾", "slot": "armor", "atk": 0, "def": 8, "lead": 0 },
+      { "id": "eq_wuhao", "name": "烏號馬", "slot": "horse", "atk": 3, "def": 2, "lead": 3 }
+    ]
+  },
+  "skills": [
+    { "id": "sk_huoji", "name": "火計", "kind": "active", "range": 3, "power": 1.4, "cooldown": 2, "desc": "燒敵陣，射程 3，傷害 ×1.4，冷卻 2 回合" },
+    { "id": "sk_tuji", "name": "突擊", "kind": "active", "range": 1, "power": 1.15, "cooldown": 1, "desc": "貼身猛攻，射程 1，傷害 ×1.15，冷卻 1 回合" },
+    { "id": "sk_sishou", "name": "死守", "kind": "passive", "defPct": 0.15, "desc": "被動：統率部隊防禦 +15%" },
+    { "id": "sk_bingfa", "name": "兵法", "kind": "passive", "troopPct": 0.1, "desc": "被動：帶兵上限 +10%" }
+  ],
+  "troops": [
+    { "id": "blade", "name": "刀兵", "start": 1200 },
+    { "id": "halberd", "name": "戟兵", "start": 800 },
+    { "id": "bow", "name": "弓兵", "start": 960 },
+    { "id": "shield", "name": "盾兵", "start": 640 },
+    { "id": "cavalry", "name": "騎兵", "start": 320 },
+    { "id": "scholar", "name": "學者", "start": 40 },
+    { "id": "beast", "name": "神獸", "start": 1 }
+  ],
+  "formation": { "slots": 3, "minCount": 1 }
+}

@@ -23,6 +23,8 @@ export function LeftPanel({
   resources,
   morale,
   taxLabel,
+  general,
+  troops,
 }: {
   profile: UiProfile
   tab: "general" | "troops"
@@ -32,7 +34,11 @@ export function LeftPanel({
   resources?: Record<string, { value: string; yieldText: string }>
   morale?: number
   taxLabel?: string
+  general?: { name: string; level: number; expPct: number; stat: string; status: string } | null
+  troops?: readonly { name: string; count: number | string }[]
 }) {
+  const generalView = general ?? MOCK_GENERAL
+  const troopRows = troops?.length ? troops : MOCK_TROOPS
   const panel = uiNode(profile, "area_left")
   const avatar = uiNode(profile, "avatar")
   const name = uiNode(profile, "monarch_name")
@@ -199,16 +205,16 @@ export function LeftPanel({
           boxShadow: tab === "general" ? `inset 0 0 0 1px ${STYLE.gold}` : `inset 0 0 0 1px ${STYLE.border}`,
         }}
       >
-        <p style={{ ...place(generalName, card), ...textFace(generalName, "title") }}>{MOCK_GENERAL.name}</p>
-        <p style={{ ...place(generalLevel, card), ...textFace(generalLevel, "title") }}>Lv.{MOCK_GENERAL.level}</p>
+        <p style={{ ...place(generalName, card), ...textFace(generalName, "title") }}>{generalView.name}</p>
+        <p style={{ ...place(generalLevel, card), ...textFace(generalLevel, "title") }}>Lv.{generalView.level}</p>
         <p style={{ ...place(generalStat, card), ...textFace(generalStat, "value"), display: "flex", alignItems: "center" }}>
-          {MOCK_GENERAL.stat}
+          {generalView.stat}
         </p>
         <div style={{ ...place(generalExp, card), background: STYLE.border, boxShadow: `inset 0 0 0 1px ${STYLE.gold}` }}>
-          <div style={{ width: `${MOCK_GENERAL.expPct}%`, height: "100%", background: STYLE.building }} />
+          <div style={{ width: `${generalView.expPct}%`, height: "100%", background: STYLE.building }} />
         </div>
         <p style={{ ...place(generalStatus, card), ...textFace(generalStatus, "title"), display: "flex", alignItems: "center" }}>
-          狀態：{MOCK_GENERAL.status}
+          狀態：{generalView.status}
           {morale !== undefined ? `　民心 ${morale}` : ""}
         </p>
         <FaceButton
@@ -230,7 +236,7 @@ export function LeftPanel({
           裝備
         </FaceButton>
       </div>
-      {MOCK_TROOPS.map((troop, index) => {
+      {troopRows.map((troop, index) => {
         const row = uiNode(profile, `troop_${index}`)
         const icon = uiNode(profile, `troop_${index}_icon`)
         const count = uiNode(profile, `troop_${index}_count`)

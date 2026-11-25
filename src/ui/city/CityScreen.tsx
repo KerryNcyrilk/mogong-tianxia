@@ -3,6 +3,7 @@ import { sysLog } from "@syslog"
 import { BottomBar } from "./BottomBar.tsx"
 import { CornerButtons } from "./CornerButtons.tsx"
 import { LeftPanel } from "./LeftPanel.tsx"
+import { GeneralPanel } from "./GeneralPanel.tsx"
 import { MOCK_CHAT_SEED, MOCK_CHAT_TABS } from "./mock.ts"
 import { artboardFrame, profileOf } from "./rects.ts"
 import { WorldHotZones } from "./WorldHotZones.tsx"
@@ -10,6 +11,22 @@ import { CAMERA_DEFAULT_ZOOM, CAMERA_ZOOMS, STYLE, type UiProfile } from "./toke
 import { INTERNAL_CONFIG } from "../../internal/config.ts"
 import { createState, enqueue, formatResource, load, moraleMultiplier, rollEvents, save, setTax, tick, taxRate } from "../../internal/engine.ts"
 import type { InternalState, TaxRate } from "../../internal/types.ts"
+import { GENERAL_CONFIG } from "../../general/config.ts"
+import {
+  createRoster,
+  equip as equipItem,
+  expPct,
+  gainExp,
+  load as loadRoster,
+  recruit,
+  refreshTavern,
+  save as saveRoster,
+  setActive,
+  setFormation,
+  statsOf,
+  troopRows,
+} from "../../general/engine.ts"
+import type { RosterState } from "../../general/types.ts"
 
 const TAX_ORDER: TaxRate["id"][] = ["low", "mid", "high"]
 
@@ -53,6 +70,8 @@ export function CityScreen() {
   const [log, setLog] = useState("MOCK_待命")
   const [elapsed, setElapsed] = useState(0)
   const [internal, setInternal] = useState<InternalState>(() => load(INTERNAL_CONFIG) ?? createState(INTERNAL_CONFIG))
+  const [roster, setRoster] = useState<RosterState>(() => refreshTavern(loadRoster(GENERAL_CONFIG) ?? createRoster(GENERAL_CONFIG), GENERAL_CONFIG))
+  const [panel, setPanel] = useState(false)
 
   useEffect(() => {
     let ticks = 0
@@ -61,6 +80,14 @@ export function CityScreen() {
         let next = tick(current, INTERNAL_CONFIG, INTERNAL_CONFIG.tickSeconds)
         ticks += 1
         if (ticks % 60 === 0) {
+          setRoster((current) => {
+            let grown = current
+            for (const slot of current.formation) {
+              if (slot.generalId) grown = gainExp(grown, slot.generalId, 12, GENERAL_CONFIG).state
+            }
+            saveRoster(grown)
+            return grown
+          })
           const rolled = rollEvents(next, INTERNAL_CONFIG, 1)
           next = rolled.state
           if (__SYSLOG__) {
@@ -105,6 +132,28 @@ export function CityScreen() {
     }, 1000)
     return () => window.clearInterval(timer)
   }, [])
+
+  const activeGeneral = roster.generals.find((item) => item.id === roster.activeId) ?? roster.generals[0]
+  const generalView = activeGeneral
+    ? {
+        name: activeGeneral.name,
+        level: activeGeneral.level,
+        expPct: expPct(activeGeneral, GENERAL_CONFIG),
+        stat: `攻 ${statsOf(activeGeneral, GENERAL_CONFIG).atk} 防 ${statsOf(activeGeneral, GENERAL_CONFIG).def}`,
+        status: roster.formation.some((slot) => slot.generalId === activeGeneral.id) ? "校場列陣" : "待命",
+      }
+    : null
+  const troopView = troopRows(roster, GENERAL_CONFIG)
+  const wallet = { coin: internal.resources.coin, jade: internal.resources.jade }
+
+  function leftAction(message: string) {
+    if (message === "MOCK_技能" || message === "MOCK_裝備") {
+      setPanel(true)
+      setLog(`B6 武將面板 ${message.replace("MOCK_", "")}`)
+      return
+    }
+    setLog(message)
+  }
 
   const profile: UiProfile = profileOf(size)
   const world = artboardFrame(zoom, profile)
@@ -186,10 +235,12 @@ export function CityScreen() {
               tab={tab}
               log={log}
               onTab={setTab}
-              onAction={setLog}
+              onAction={leftAction}
               resources={resourceView}
               morale={Math.round(internal.morale)}
               taxLabel={rate.label}
+              general={generalView}
+              troops={troopView}
             />
             <BottomBar
           profile={profile}
@@ -223,11 +274,62 @@ export function CityScreen() {
               setLog(`內政 稅率切至 ${INTERNAL_CONFIG.tax.rates.find((item) => item.id === next)?.label ?? next}`)
               return
             }
+            if (message === "MOCK_技能" || message === "MOCK_裝備") {
+              setPanel(true)
+              setLog(`B6 武將面板 ${message.replace("MOCK_", "")}`)
+              return
+            }
             setLog(message)
           }}
         />
           </>
         )}
+        {panel ? (
+          <GeneralPanel
+            roster={roster}
+            config={GENERAL_CONFIG}
+            wallet={wallet}
+            onClose={() => setPanel(false)}
+            onActive={(id) => setRoster((current) => setActive(current, id).state)}
+            onRecruit={(id) => {
+              const result = recruit(roster, GENERAL_CONFIG, id, wallet)
+              if (!result.ok) {
+                setLog(`酒館招募失敗：${result.reason ?? "unknown"}`)
+                return
+              }
+              setRoster(result.state ?? roster)
+              saveRoster(result.state)
+              const cost = result.cost ?? { coin: 0, jade: 0 }
+              setInternal((current) => {
+                const next = { ...current, resources: { ...current.resources } }
+                next.resources.coin -= cost.coin
+                next.resources.jade -= cost.jade
+                save(next)
+                return next
+              })
+              setLog("酒館 新武將入麾下")
+            }}
+            onEquip={(itemId) => {
+              if (!activeGeneral) return
+              const result = equipItem(roster, activeGeneral.id, itemId, GENERAL_CONFIG)
+              if (result.ok) {
+                setRoster(result.state)
+                saveRoster(result.state)
+                setLog("裝備已換")
+              }
+            }}
+            onSlot={(index, id, unit, count) => {
+              const result = setFormation(roster, GENERAL_CONFIG, index, id, unit, count)
+              if (!result.ok) {
+                setLog(`編隊不成立：${result.reason ?? "unknown"}`)
+                return
+              }
+              setRoster(result.state)
+              saveRoster(result.state)
+              setLog("校場編隊已更新")
+            }}
+          />
+        ) : null}
         <CornerButtons
           profile={profile}
           outside={outside}

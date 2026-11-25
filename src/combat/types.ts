@@ -9,11 +9,20 @@ export type UnitType =
   | "halberd"
   | "shield"
 
+export interface SkillRef {
+  id: string
+  name: string
+  range: number
+  power: number
+  cooldown: number
+}
+
 export interface General {
   id: string
   name: string
   atk: number
   def: number
+  skills?: SkillRef[]
 }
 
 export interface Squad {
