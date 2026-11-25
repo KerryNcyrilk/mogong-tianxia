@@ -13,9 +13,13 @@ const HEIGHT = PAD * 2 + CELL * GRID_ROWS
 interface BattleCanvasProps {
   squads: readonly Squad[]
   highlightId: string | null
+  /** B2 手動模式：格點擊。無此 prop 時畫布只讀。 */
+  onCellClick?: (cell: { x: number; y: number }) => void
+  moveCells?: ReadonlySet<string>
+  attackCells?: ReadonlySet<string>
 }
 
-export function BattleCanvas({ squads, highlightId }: BattleCanvasProps) {
+export function BattleCanvas({ squads, highlightId, onCellClick, moveCells, attackCells }: BattleCanvasProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const appRef = useRef<Application | null>(null)
   const texturesRef = useRef<Map<string, Texture>>(new Map())
@@ -67,6 +71,7 @@ export function BattleCanvas({ squads, highlightId }: BattleCanvasProps) {
         app.canvas.style.width = "100%"
         app.canvas.style.height = "auto"
         app.canvas.style.display = "block"
+        app.canvas.style.cursor = "default"
         host.appendChild(app.canvas)
         appRef.current = app
         setReady(true)
@@ -86,8 +91,30 @@ export function BattleCanvas({ squads, highlightId }: BattleCanvasProps) {
     if (!ready) return
     const app = appRef.current
     if (!app) return
-    paint(app, texturesRef.current, squads, highlightId)
-  }, [ready, squads, highlightId])
+    paint(app, texturesRef.current, squads, highlightId, moveCells, attackCells)
+  }, [ready, squads, highlightId, moveCells, attackCells])
+
+  useEffect(() => {
+    if (!ready || !onCellClick) return
+    const app = appRef.current
+    if (!app) return
+    const canvas = app.canvas
+    canvas.style.cursor = "crosshair"
+    const handler = (event: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      const scaleX = WIDTH / rect.width
+      const scaleY = HEIGHT / rect.height
+      const x = Math.floor(((event.clientX - rect.left) * scaleX - PAD) / CELL)
+      const y = Math.floor(((event.clientY - rect.top) * scaleY - PAD) / CELL)
+      if (x < 0 || y < 0 || x >= GRID_COLS || y >= GRID_ROWS) return
+      onCellClick({ x, y })
+    }
+    canvas.addEventListener("pointerdown", handler)
+    return () => {
+      canvas.removeEventListener("pointerdown", handler)
+      canvas.style.cursor = "default"
+    }
+  }, [ready, onCellClick])
 
   return (
     <div
@@ -102,7 +129,14 @@ export function BattleCanvas({ squads, highlightId }: BattleCanvasProps) {
   )
 }
 
-function paint(app: Application, textures: Map<string, Texture>, squads: readonly Squad[], highlightId: string | null) {
+function paint(
+  app: Application,
+  textures: Map<string, Texture>,
+  squads: readonly Squad[],
+  highlightId: string | null,
+  moveCells?: ReadonlySet<string>,
+  attackCells?: ReadonlySet<string>,
+) {
   const stage = app.stage
   stage.removeChildren()
   const world = new Container()
@@ -134,6 +168,21 @@ function paint(app: Application, textures: Map<string, Texture>, squads: readonl
     grid.moveTo(PAD, py).lineTo(PAD + CELL * GRID_COLS, py).stroke({ width: 1, color: 0x1b1712, alpha: 0.28 })
   }
   world.addChild(grid)
+
+  if (moveCells || attackCells) {
+    const layer = new Graphics()
+    for (const key of moveCells ?? []) {
+      const [mx, my] = key.split(",").map(Number)
+      if (mx == null || my == null) continue
+      layer.rect(PAD + mx * CELL + 3, PAD + my * CELL + 3, CELL - 6, CELL - 6).stroke({ width: 2, color: 0x8a6a32 })
+    }
+    for (const key of attackCells ?? []) {
+      const [ax, ay] = key.split(",").map(Number)
+      if (ax == null || ay == null) continue
+      layer.rect(PAD + ax * CELL + 3, PAD + ay * CELL + 3, CELL - 6, CELL - 6).stroke({ width: 2, color: 0x7c312c })
+    }
+    world.addChild(layer)
+  }
 
   for (const squad of squads) {
     if (!isAlive(squad)) continue

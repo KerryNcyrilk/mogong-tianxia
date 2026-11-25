@@ -1,0 +1,19 @@
+# B2 紅線自證（base da3aaf2 → HEAD）
+
+## cityLayout.json
+e380c3abaea0e451008b2c03fcd5ae13  data/cityLayout.json
+
+## units.json
+74533c093c4a1307bd4264c4edcfa7a4  data/units.json
+
+## 兩檔 diff 行數（0 = 零改）
+0
+
+## 本輪允許改動範圍
+ M package-lock.json
+ M src/ui/BattleCanvas.tsx
+ M src/ui/BattleView.tsx
+?? data/boardMove.json
+?? docs/evidence/B2/
+?? src/combat/board.ts
+?? tests/b2-board.test.ts
