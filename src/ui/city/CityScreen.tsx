@@ -5,7 +5,7 @@ import { CornerButtons } from "./CornerButtons.tsx"
 import { LeftPanel } from "./LeftPanel.tsx"
 import { GeneralPanel } from "./GeneralPanel.tsx"
 import { MOCK_CHAT_SEED, MOCK_CHAT_TABS } from "./mock.ts"
-import { artboardFrame, profileOf } from "./rects.ts"
+import { artboardFrame, profileOf, v3CoverFrame } from "./rects.ts"
 import { WorldHotZones } from "./WorldHotZones.tsx"
 import { HotspotOutline } from "./HotspotOutline.tsx"
 import { V3WorldLayer } from "./V3WorldLayer.tsx"
@@ -230,8 +230,8 @@ export function CityScreen() {
 
   const profile: UiProfile = profileOf(size)
   const world = artboardFrame(zoom, profile)
-  // v3 底圖左錨 safe 邊，避免左欄長期遮住民居／工坊／寶塔等熱區；灰盒維持原 offset。
-  const v3frame = { ...world, x: profile.safe.x }
+  // v3 底圖左錨 safe 邊（避免左欄遮住熱區）；縮到細過 safe 區時拉伸填滿，唔露底。灰盒維持原 offset。
+  const v3frame = v3CoverFrame(zoom, profile)
 
   function sendChat() {
     const text = drafts[chatTab].trim()
