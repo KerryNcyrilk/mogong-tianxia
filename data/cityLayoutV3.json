@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "id": "city-v3",
+  "note": "v3 寫實整城底圖的顯示座標權威。舊 data/cityLayout.json 零改，灰盒渲染繼續讀舊檔。polygon 為 2496×1440 原圖像素座標（順時針）。",
+  "art": {
+    "src": "/art/v3/city_full_base_v11_2496x1440.jpg",
+    "w": 2496,
+    "h": 1440
+  },
+  "zones": [
+    {
+      "id": "gov",
+      "label": "官府",
+      "kind": "gov",
+      "levelKind": "gov",
+      "action": "MOCK_升級:gov",
+      "badge": [1478, 880],
+      "polygon": [[1250, 770], [1565, 715], [1905, 885], [1880, 1210], [1700, 1305], [1250, 1180]]
+    },
+    {
+      "id": "drill",
+      "label": "校場",
+      "kind": "drill",
+      "levelKind": "drill",
+      "action": "MOCK_列陣",
+      "badge": [700, 930],
+      "polygon": [[398, 757], [1022, 786], [1004, 1066], [390, 1038]]
+    },
+    {
+      "id": "gate_n",
+      "label": "北門塔",
+      "kind": "gate",
+      "action": "MOCK_出城",
+      "tag": "出城",
+      "badge": [1005, 400],
+      "polygon": [[852, 298], [1142, 302], [1128, 458], [1042, 478], [858, 452]]
+    },
+    {
+      "id": "market",
+      "label": "市集",
+      "kind": "market",
+      "levelKind": "market",
+      "action": "MOCK_升級:market",
+      "badge": [1310, 520],
+      "polygon": [[1218, 412], [1408, 432], [1398, 628], [1208, 600]]
+    },
+    {
+      "id": "barrack",
+      "label": "兵營倉庫",
+      "kind": "barrack",
+      "levelKind": "barrack",
+      "action": "MOCK_徵兵",
+      "badge": [1605, 400],
+      "polygon": [[1420, 332], [1818, 372], [1808, 468], [1412, 448]]
+    },
+    {
+      "id": "workshop",
+      "label": "工坊",
+      "kind": "workshop",
+      "action": "MOCK_工坊",
+      "badge": [100, 600],
+      "polygon": [[2, 538], [208, 545], [202, 722], [0, 714]]
+    },
+    {
+      "id": "stable",
+      "label": "馬廐",
+      "kind": "stable",
+      "action": "MOCK_馬廐",
+      "badge": [360, 560],
+      "polygon": [[228, 486], [508, 494], [502, 684], [222, 676]]
+    },
+    {
+      "id": "tavern",
+      "label": "酒館",
+      "kind": "tavern",
+      "action": "MOCK_酒館",
+      "badge": [2295, 940],
+      "polygon": [[2150, 905], [2430, 920], [2438, 1110], [2150, 1100]]
+    },
+    {
+      "id": "house",
+      "label": "民居",
+      "kind": "house",
+      "levelKind": "house",
+      "action": "MOCK_升級:house",
+      "badge": [2080, 1330],
+      "polygon": [[1768, 1266], [2480, 1302], [2484, 1440], [1760, 1428]]
+    },
+    {
+      "id": "farm",
+      "label": "農田",
+      "kind": "farm",
+      "levelKind": "farm",
+      "action": "MOCK_升級:farm",
+      "badge": [1450, 196],
+      "polygon": [[1360, 160], [1546, 170], [1542, 250], [1356, 240]]
+    },
+    {
+      "id": "pond",
+      "label": "池塘",
+      "kind": "pond",
+      "action": "MOCK_池塘",
+      "badge": [2300, 660],
+      "polygon": [[2138, 545], [2496, 550], [2496, 900], [2172, 832]]
+    },
+    {
+      "id": "pavilion",
+      "label": "亭院",
+      "kind": "pavilion",
+      "action": "MOCK_亭院",
+      "badge": [245, 840],
+      "polygon": [[122, 746], [352, 772], [342, 1002], [118, 982]]
+    },
+    {
+      "id": "shrine",
+      "label": "寶塔",
+      "kind": "shrine",
+      "action": "MOCK_寶塔",
+      "badge": [52, 820],
+      "polygon": [[14, 728], [98, 736], [88, 948], [8, 934]]
+    }
+  ]
+}

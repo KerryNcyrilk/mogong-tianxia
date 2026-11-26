@@ -5,9 +5,10 @@ import { CornerButtons } from "./CornerButtons.tsx"
 import { LeftPanel } from "./LeftPanel.tsx"
 import { GeneralPanel } from "./GeneralPanel.tsx"
 import { MOCK_CHAT_SEED, MOCK_CHAT_TABS } from "./mock.ts"
-import { artboardFrame, profileOf } from "./rects.ts"
+import { artboardFrame, profileOf, v3CoverFrame } from "./rects.ts"
 import { WorldHotZones } from "./WorldHotZones.tsx"
 import { HotspotOutline } from "./HotspotOutline.tsx"
+import { V3WorldLayer } from "./V3WorldLayer.tsx"
 import { ExpeditionView } from "../expedition/ExpeditionView.tsx"
 import { RecruitPanel } from "../expedition/RecruitPanel.tsx"
 import { StageMap } from "../expedition/StageMap.tsx"
@@ -55,12 +56,29 @@ function initialSize(): 1280 | 1920 {
 
 function initialZoom(): number {
   const raw = Number(new URLSearchParams(window.location.search).get("zoom"))
-  return CAMERA_ZOOMS.some((step) => step === raw) ? raw : CAMERA_DEFAULT_ZOOM
+  if (CAMERA_ZOOMS.some((step) => step === raw)) return raw
+  // v3 底圖係 2496×1440 全景，0.4 剛好完整入 safe 區；灰盒沿用 0.5 舊預設。
+  return initialSkin() === "v3" ? 0.4 : CAMERA_DEFAULT_ZOOM
+}
+
+function initialSkin(): "v3" | "box" {
+  return new URLSearchParams(window.location.search).get("skin") === "box" ? "box" : "v3"
+}
+
+function initialFocus(): string | null {
+  return new URLSearchParams(window.location.search).get("focus")
+}
+
+function initialNames(): boolean {
+  return new URLSearchParams(window.location.search).get("names") === "1"
 }
 
 export function CityScreen() {
   const [size, setSize] = useState<1280 | 1920>(initialSize)
   const [zoom, setZoom] = useState<number>(initialZoom)
+  const [skin, setSkin] = useState<"v3" | "box">(initialSkin)
+  const [focusId] = useState<string | null>(initialFocus)
+  const [namesOn] = useState<boolean>(initialNames)
   const [tab, setTab] = useState<"general" | "troops">("general")
   const [chatTab, setChatTab] = useState<ChatId>("chat_all")
   const [drafts, setDrafts] = useState<Record<ChatId, string>>({
@@ -157,7 +175,28 @@ export function CityScreen() {
   const troopView = troopRows(roster, GENERAL_CONFIG)
   const wallet = { coin: internal.resources.coin, jade: internal.resources.jade }
 
+  function build(kind: string) {
+    const result = enqueue(internal, INTERNAL_CONFIG, kind)
+    if (result.ok) {
+      setInternal(result.state)
+      const label = INTERNAL_CONFIG.buildings.find((item) => item.kind === kind)?.label ?? kind
+      setLog(`內政 ${label} 已入隊`)
+      if (__SYSLOG__) sysLog.info("internal", "internal.queue.change", { kind, action: "enqueue" })
+    } else {
+      setLog(`內政 建造失敗：${result.reason ?? "unknown"}`)
+    }
+  }
+
   function leftAction(message: string) {
+    if (message.startsWith("MOCK_升級:")) {
+      build(message.slice("MOCK_升級:".length))
+      return
+    }
+    if (message === "MOCK_列陣" || message === "MOCK_酒館") {
+      setPanel(true)
+      setLog(message === "MOCK_酒館" ? "酒館 招募與編隊" : "校場 列陣編隊")
+      return
+    }
     if (message === "MOCK_技能" || message === "MOCK_裝備") {
       setPanel(true)
       setLog(`B6 武將面板 ${message.replace("MOCK_", "")}`)
@@ -191,6 +230,8 @@ export function CityScreen() {
 
   const profile: UiProfile = profileOf(size)
   const world = artboardFrame(zoom, profile)
+  // v3 底圖左錨 safe 邊（避免左欄遮住熱區）；縮到細過 safe 區時拉伸填滿，唔露底。灰盒維持原 offset。
+  const v3frame = v3CoverFrame(zoom, profile)
 
   function sendChat() {
     const text = drafts[chatTab].trim()
@@ -216,7 +257,10 @@ export function CityScreen() {
         <a href="/" style={{ color: STYLE.gold }}>
           返回戰鬥
         </a>
-        <span style={{ color: STYLE.textMuted }}>主城灰盒</span>
+        <span style={{ color: STYLE.textMuted }}>{skin === "v3" ? "主城 v3 換皮" : "主城灰盒"}</span>
+        <button type="button" onClick={() => setSkin((current) => (current === "v3" ? "box" : "v3"))} style={chromeButton(false)}>
+          {skin === "v3" ? "切灰盒" : "切 v3"}
+        </button>
         {[1280, 1920].map((candidate) => (
           <button
             key={candidate}
@@ -253,20 +297,26 @@ export function CityScreen() {
         }}
       >
         <>
-            <img
-              src="/art/board/city-placeholder.svg"
-              alt=""
-              draggable={false}
-              style={{
-                position: "absolute",
-                left: world.x,
-                top: world.y,
-                width: world.w,
-                height: world.h,
-                pointerEvents: "none",
-              }}
-            />
-            <WorldHotZones profile={profile} zoom={zoom} onAction={leftAction} />
+            {skin === "v3" ? (
+              <V3WorldLayer frame={v3frame} internal={internal} onAction={leftAction} showAllNames={outlineOn || namesOn} focusId={focusId} />
+            ) : (
+              <>
+                <img
+                  src="/art/board/city-placeholder.svg"
+                  alt=""
+                  draggable={false}
+                  style={{
+                    position: "absolute",
+                    left: world.x,
+                    top: world.y,
+                    width: world.w,
+                    height: world.h,
+                    pointerEvents: "none",
+                  }}
+                />
+                <WorldHotZones profile={profile} zoom={zoom} onAction={leftAction} />
+              </>
+            )}
             <LeftPanel
               profile={profile}
               tab={tab}
@@ -294,14 +344,7 @@ export function CityScreen() {
           onSend={sendChat}
           onAction={(message) => {
             if (message === "MOCK_建築") {
-              const result = enqueue(internal, INTERNAL_CONFIG, "house")
-              if (result.ok) {
-                setInternal(result.state)
-                setLog("內政 民居已入隊")
-                if (__SYSLOG__) sysLog.info("internal", "internal.queue.change", { kind: "house", action: "enqueue" })
-              } else {
-                setLog(`內政 建造失敗：${result.reason ?? "unknown"}`)
-              }
+              build("house")
               return
             }
             if (message.startsWith("MOCK_加刀幣")) {
@@ -366,7 +409,7 @@ export function CityScreen() {
             }}
           />
         ) : null}
-        {outlineOn ? <HotspotOutline profile={profile} zoom={zoom} /> : null}
+        {outlineOn && skin === "box" ? <HotspotOutline profile={profile} zoom={zoom} /> : null}
         {mapOpen ? (
           <StageMap
             file={STAGE_FILE}

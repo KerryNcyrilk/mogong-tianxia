@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "cityHotspots.v3-draft.v0.1",
+  "source": "豆包手描於 Iris v3 整城底圖（2496×1440）",
+  "canvas": {
+    "w": 2496,
+    "h": 1440
+  },
+  "hotspots": [
+    {
+      "id": "gov",
+      "label": "官府",
+      "action": "官府",
+      "confidence": "confirmed",
+      "polygon": [
+        {
+          "x": 900,
+          "y": 610
+        },
+        {
+          "x": 1780,
+          "y": 700
+        },
+        {
+          "x": 1750,
+          "y": 1190
+        },
+        {
+          "x": 880,
+          "y": 1100
+        }
+      ]
+    },
+    {
+      "id": "drill",
+      "label": "校場",
+      "action": "出征",
+      "confidence": "confirmed",
+      "polygon": [
+        {
+          "x": 430,
+          "y": 700
+        },
+        {
+          "x": 900,
+          "y": 745
+        },
+        {
+          "x": 880,
+          "y": 1060
+        },
+        {
+          "x": 415,
+          "y": 1015
+        }
+      ]
+    },
+    {
+      "id": "gate_n",
+      "label": "城門",
+      "action": "出城",
+      "confidence": "confirmed",
+      "polygon": [
+        {
+          "x": 910,
+          "y": 320
+        },
+        {
+          "x": 1140,
+          "y": 350
+        },
+        {
+          "x": 1125,
+          "y": 480
+        },
+        {
+          "x": 895,
+          "y": 450
+        }
+      ]
+    },
+    {
+      "id": "pond",
+      "label": "池塘",
+      "action": "—",
+      "confidence": "confirmed",
+      "polygon": [
+        {
+          "x": 2060,
+          "y": 580
+        },
+        {
+          "x": 2490,
+          "y": 600
+        },
+        {
+          "x": 2490,
+          "y": 830
+        },
+        {
+          "x": 2050,
+          "y": 810
+        }
+      ]
+    },
+    {
+      "id": "barrack",
+      "label": "營房（疑 點兵場）",
+      "action": "徵兵",
+      "confidence": "provisional",
+      "polygon": [
+        {
+          "x": 600,
+          "y": 470
+        },
+        {
+          "x": 860,
+          "y": 490
+        },
+        {
+          "x": 850,
+          "y": 650
+        },
+        {
+          "x": 595,
+          "y": 630
+        }
+      ]
+    },
+    {
+      "id": "market",
+      "label": "輜重／市集（疑）",
+      "action": "市集",
+      "confidence": "provisional",
+      "polygon": [
+        {
+          "x": 1020,
+          "y": 430
+        },
+        {
+          "x": 1320,
+          "y": 470
+        },
+        {
+          "x": 1310,
+          "y": 670
+        },
+        {
+          "x": 1010,
+          "y": 630
+        }
+      ]
+    },
+    {
+      "id": "farm",
+      "label": "牧場（疑 農田）",
+      "action": "農田",
+      "confidence": "provisional",
+      "polygon": [
+        {
+          "x": 300,
+          "y": 590
+        },
+        {
+          "x": 700,
+          "y": 620
+        },
+        {
+          "x": 690,
+          "y": 750
+        },
+        {
+          "x": 300,
+          "y": 730
+        }
+      ]
+    }
+  ]
+}
