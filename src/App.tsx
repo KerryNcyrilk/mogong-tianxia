@@ -1,13 +1,14 @@
 import { BattleView } from "./ui/BattleView.tsx"
 import { CityScreen } from "./ui/city/CityScreen.tsx"
 
-function cityRoute(): boolean {
+/** 根路由直接入主城；戰鬥改由 /battle（及主城「出城／校場」入口）進入。 */
+function route(): "city" | "battle" {
   const path = window.location.pathname.replace(/\/+$/, "")
-  return path === "/city"
+  return path === "/battle" ? "battle" : "city"
 }
 
 export default function App() {
-  if (cityRoute()) return <CityScreen />
+  if (route() === "city") return <CityScreen />
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="mb-8 flex flex-col gap-3 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
@@ -15,7 +16,7 @@ export default function App() {
           <p className="text-xs tracking-[0.35em] text-[#5c5348]">單人試作 · 戰鬥切片</p>
           <h1 className="mt-2 font-serif text-4xl tracking-wide">墨攻天下</h1>
           <a className="mt-3 inline-block text-sm text-[#243e66] underline" href="/city">
-            進入主城
+            返回主城
           </a>
         </div>
         <p className="max-w-md text-sm leading-6 text-[#3d3832]">
