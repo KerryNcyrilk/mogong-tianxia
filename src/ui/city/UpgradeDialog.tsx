@@ -27,12 +27,15 @@ export function UpgradeDialog({
   scale,
   onConfirm,
   onClose,
+  forceReason = null,
 }: {
   building: BuildingDef
   internal: InternalState
   scale: number
   onConfirm: () => void
   onClose: () => void
+  /** 開發預覽用。官方呼叫不傳，仍走資源／隊列判斷。人口滿不是官方升級曲線。 */
+  forceReason?: string | null
 }) {
   const level = internal.levels[building.kind] ?? 1
   const next = level + 1
@@ -41,7 +44,8 @@ export function UpgradeDialog({
   const affordable = canPay(internal, cost)
   const building2 = internal.slots.some((slot) => slot.kind === building.kind && slot.status !== "queued")
   const queueFull = !internal.slots.some((slot) => slot.kind === "" || slot.status === "queued")
-  const reason = building2 ? "同一建築已在施工" : queueFull ? "營造隊列已滿" : affordable ? "" : "資源不足"
+  const computed = building2 ? "同一建築已在施工" : queueFull ? "營造隊列已滿" : affordable ? "" : "資源不足"
+  const reason = forceReason ? forceReason : computed
 
   return (
     <div

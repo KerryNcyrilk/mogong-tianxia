@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react"
+import { lazy, Suspense, useEffect, useState, useSyncExternalStore, type ReactNode } from "react"
 import { STAGE_FILE } from "../../demo/stages.ts"
 import {
   INTERNAL_CONFIG,
@@ -24,6 +24,36 @@ import {
 } from "../../dev/devOverrides.ts"
 import { STYLE } from "../city/tokens.ts"
 import { DevBadFilePanel, DevBoard3DPanel, DevSandboxPanel, DevSimPanel } from "./DevLab.tsx"
+
+const DevV2B = lazy(() => import("./DevV2B.tsx"))
+
+type V2BTab = "calibrator" | "world" | "qa" | "bundle"
+type Tab = "city" | "balance" | "sandbox" | "board3d" | "sim" | "badfile" | V2BTab
+
+function isV2B(tab: Tab): tab is V2BTab {
+  return tab === "calibrator" || tab === "world" || tab === "qa" || tab === "bundle"
+}
+
+function initialTab(): Tab {
+  try {
+    const want = new URLSearchParams(window.location.search).get("v2tab")
+    if (
+      want === "sandbox" ||
+      want === "board3d" ||
+      want === "sim" ||
+      want === "badfile" ||
+      want === "calibrator" ||
+      want === "world" ||
+      want === "qa" ||
+      want === "bundle"
+    ) {
+      return want
+    }
+    return "city"
+  } catch {
+    return "city"
+  }
+}
 
 const LIVE: readonly { key: ResourceKey; label: string }[] = [
   { key: "coin", label: "刀幣" },
@@ -82,15 +112,7 @@ export function DevConsoleGate() {
 function DevConsole({ onClose }: { onClose: () => void }) {
   const bag = useSyncExternalStore(subscribeOverrides, readOverrides, readOverrides)
   const cityRev = useSyncExternalStore(subscribeCity, readCityRev, readCityRev)
-  const [tab, setTab] = useState<"city" | "balance" | "sandbox" | "board3d" | "sim" | "badfile">(() => {
-    try {
-      const want = new URLSearchParams(window.location.search).get("v2tab")
-      if (want === "sandbox" || want === "board3d" || want === "sim" || want === "badfile") return want
-      return "city"
-    } catch {
-      return "city"
-    }
-  })
+  const [tab, setTab] = useState<Tab>(initialTab)
   const [collapsed, setCollapsed] = useState(false)
   const [note, setNote] = useState("")
   const [fallback, setFallback] = useState("")
@@ -165,7 +187,7 @@ function DevConsole({ onClose }: { onClose: () => void }) {
         top: 0,
         right: 0,
         bottom: 0,
-        width: tab === "sandbox" ? 460 : 380,
+        width: tab === "sandbox" || isV2B(tab) ? 460 : 380,
         zIndex: 80,
         overflowY: "auto",
         background: STYLE.panel,
@@ -191,7 +213,7 @@ function DevConsole({ onClose }: { onClose: () => void }) {
         }}
       >
         <strong style={{ color: STYLE.gold, fontFamily: STYLE.fontTitle, fontSize: 14, marginRight: "auto" }}>
-          開發控制台 · V1＋V2A
+          開發控制台 · V1＋V2A＋V2B
         </strong>
         <button type="button" style={chip(true)} onClick={() => { resetOverrides(); setNote("係數已恢復預設") }}>
           恢復預設
@@ -230,6 +252,18 @@ function DevConsole({ onClose }: { onClose: () => void }) {
         <button type="button" style={chip(tab === "badfile")} onClick={() => setTab("badfile")}>
           壞檔
         </button>
+        <button type="button" style={chip(tab === "calibrator")} onClick={() => setTab("calibrator")}>
+          主城校準
+        </button>
+        <button type="button" style={chip(tab === "world")} onClick={() => setTab("world")}>
+          大地圖
+        </button>
+        <button type="button" style={chip(tab === "qa")} onClick={() => setTab("qa")}>
+          音效與框
+        </button>
+        <button type="button" style={chip(tab === "bundle")} onClick={() => setTab("bundle")}>
+          除錯包
+        </button>
       </div>
 
       {tab === "sandbox" ? (
@@ -256,6 +290,13 @@ function DevConsole({ onClose }: { onClose: () => void }) {
       {tab === "badfile" ? (
         <div style={{ padding: 12 }}>
           <DevBadFilePanel />
+        </div>
+      ) : null}
+      {isV2B(tab) ? (
+        <div style={{ padding: 12 }}>
+          <Suspense fallback={<p style={{ color: STYLE.textMuted }}>載入開發工具…</p>}>
+            <DevV2B tab={tab} />
+          </Suspense>
         </div>
       ) : null}
 

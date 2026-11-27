@@ -21,6 +21,11 @@ export const RECRUIT_BASE = { coin: 300, food: 120, pop: 1 } as const
 /** 審計建議：每 100 騎扣 80、每 100 盾扣 50。其餘兵種 0。比例再乘這張表。 */
 export const IRON_PER_100: Readonly<Record<string, number>> = { cavalry: 80, shield: 50 }
 
+const PHASE3_TECH_MAX = 999
+const PHASE3_AFFIX_MAX = 8
+const PHASE3_AFFIX_PATTERN = /^[A-Za-z0-9_-]{1,32}$/
+const EMPTY_AFFIXES: readonly string[] = []
+
 const DEFAULT_TIMESCALE = 1
 const DEFAULT_DRILL_EXP = 12
 const DEFAULT_WIN_EXP_MULTIPLIER = 1
@@ -47,6 +52,25 @@ export interface DevOverrideBag {
   troopDamageWeight?: number
   /** 存活比例低於此值才吃士氣懲罰。最高 0.5，與棋盤硬編碼一致。 */
   moraleThreshold?: number
+  /**
+   * Phase 3 預留。官方內政、左欄、戰鬥都未讀。
+   * 缺省時不進存檔；銅不是 ResourceKey。
+   */
+  phase3?: Phase3Reserve
+}
+
+/** 科技等級、裝備詞條、銅。只活在覆寫袋，不改官方資源鍵。 */
+export interface Phase3Reserve {
+  techLevel?: number
+  equipAffixes?: string[]
+  copper?: number
+}
+
+/** null 表示清掉該欄。空詞條陣列也會清掉。 */
+export interface Phase3Patch {
+  techLevel?: number | null
+  equipAffixes?: string[] | null
+  copper?: number | null
 }
 
 export interface DiffEntry {
@@ -69,6 +93,8 @@ export interface CityBridge {
   finishRecruit: () => void
   simulateOffline: (seconds: number) => void
   newGame: () => void
+  notify: (text: string) => void
+  previewUpgrade: (mode: "resource" | "pop" | "queue") => void
 }
 
 type Store = Pick<Storage, "getItem" | "setItem" | "removeItem">
@@ -103,6 +129,31 @@ function clampNum(value: unknown, min: number, max: number, fallback: number): n
 
 function isTroop(unit: string): unit is TroopId {
   return (TROOP_IDS as readonly string[]).includes(unit)
+}
+
+function sanitizePhase3(raw: unknown): Phase3Reserve | undefined {
+  if (!raw || typeof raw !== "object") return undefined
+  const source = raw as Phase3Patch
+  const next: Phase3Reserve = {}
+  if (typeof source.techLevel === "number") {
+    next.techLevel = Math.round(clampNum(source.techLevel, 0, PHASE3_TECH_MAX, 0))
+  }
+  if (typeof source.copper === "number") {
+    next.copper = clampNum(source.copper, 0, 1e12, 0)
+  }
+  if (Array.isArray(source.equipAffixes)) {
+    const affixes: string[] = []
+    for (const item of source.equipAffixes) {
+      if (typeof item !== "string") continue
+      const id = item.trim()
+      if (!PHASE3_AFFIX_PATTERN.test(id) || affixes.includes(id)) continue
+      affixes.push(id)
+      if (affixes.length >= PHASE3_AFFIX_MAX) break
+    }
+    if (affixes.length > 0) next.equipAffixes = affixes
+  }
+  if (next.techLevel === undefined && next.copper === undefined && next.equipAffixes === undefined) return undefined
+  return next
 }
 
 function normalize(raw: Partial<DevOverrideBag> | null | undefined): DevOverrideBag {
@@ -143,6 +194,8 @@ function normalize(raw: Partial<DevOverrideBag> | null | undefined): DevOverride
     }
     bag.unitCost = unitCost
   }
+  const phase3 = sanitizePhase3(raw.phase3)
+  if (phase3) bag.phase3 = phase3
   return bag
 }
 
@@ -192,6 +245,10 @@ function strip(bag: DevOverrideBag): DevOverrideBag | null {
       any = true
     }
     if (Object.keys(unitCost).length > 0) next.unitCost = unitCost
+  }
+  if (bag.phase3) {
+    next.phase3 = bag.phase3
+    any = true
   }
   return any ? next : null
 }
@@ -282,13 +339,49 @@ export function overridesIdle(): boolean {
 
 export function updateOverrides(patch: Partial<Omit<DevOverrideBag, "v">>): void {
   const base = touch() ?? { v: 1 as const }
-  commit({
+  const next: DevOverrideBag = {
     ...base,
     ...patch,
+    v: 1,
     start: patch.start ? { ...base.start, ...patch.start } : base.start,
     unitCost: patch.unitCost ? { ...base.unitCost, ...patch.unitCost } : base.unitCost,
     iron: patch.iron ? { ...(base.iron ?? { on: false, ratio: DEFAULT_IRON_RATIO }), ...patch.iron } : base.iron,
+  }
+  const phase3 = patch.phase3 !== undefined ? sanitizePhase3({ ...base.phase3, ...patch.phase3 }) : base.phase3
+  if (phase3) next.phase3 = phase3
+  else delete next.phase3
+  commit(next)
+}
+
+export function updatePhase3(patch: Phase3Patch): void {
+  const base = touch() ?? { v: 1 as const }
+  const phase3 = sanitizePhase3({
+    techLevel: patch.techLevel === null ? undefined : patch.techLevel !== undefined ? patch.techLevel : base.phase3?.techLevel,
+    copper: patch.copper === null ? undefined : patch.copper !== undefined ? patch.copper : base.phase3?.copper,
+    equipAffixes: patch.equipAffixes === null ? undefined : patch.equipAffixes !== undefined ? patch.equipAffixes : base.phase3?.equipAffixes,
   })
+  const next: DevOverrideBag = { ...base, v: 1 }
+  if (phase3) next.phase3 = phase3
+  else delete next.phase3
+  commit(next)
+}
+
+export function phase3TechLevel(base = 0): number {
+  if (fast) return base
+  const value = touch()?.phase3?.techLevel
+  return value === undefined ? base : value
+}
+
+/** 未覆寫回 null。0 是明確覆寫，不是官方存量。 */
+export function phase3Copper(): number | null {
+  if (fast) return null
+  const value = touch()?.phase3?.copper
+  return value === undefined ? null : value
+}
+
+export function phase3EquipAffixes(): readonly string[] {
+  if (fast) return EMPTY_AFFIXES
+  return touch()?.phase3?.equipAffixes ?? EMPTY_AFFIXES
 }
 
 export function resetOverrides(): void {
@@ -430,6 +523,9 @@ export function overrideDiff(): Record<string, DiffEntry> {
       diff[`unitCost.${id}`] = { from: 1, to: value }
     }
   }
+  if (bag.phase3?.techLevel !== undefined) diff["phase3.techLevel"] = { from: 0, to: bag.phase3.techLevel }
+  if (bag.phase3?.copper !== undefined) diff["phase3.copper"] = { from: 0, to: bag.phase3.copper }
+  if (bag.phase3?.equipAffixes) diff["phase3.equipAffixes"] = { from: 0, to: bag.phase3.equipAffixes.length }
   return diff
 }
 
