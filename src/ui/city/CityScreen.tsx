@@ -5,7 +5,7 @@ import { CornerButtons } from "./CornerButtons.tsx"
 import { LeftPanel } from "./LeftPanel.tsx"
 import { GeneralPanel } from "./GeneralPanel.tsx"
 import { MOCK_CHAT_SEED, MOCK_CHAT_TABS } from "./mock.ts"
-import { profileOf, v3CoverFrame } from "./rects.ts"
+import { cityFrame, profileOf, v3CoverFrame } from "./rects.ts"
 import { V3WorldLayer } from "./V3WorldLayer.tsx"
 import { UpgradeDialog } from "./UpgradeDialog.tsx"
 import { ExpeditionView } from "../expedition/ExpeditionView.tsx"
@@ -109,6 +109,7 @@ export function CityScreen() {
   const [internal, setInternal] = useState<InternalState>(() => load(INTERNAL_CONFIG) ?? createState(INTERNAL_CONFIG))
   const [roster, setRoster] = useState<RosterState>(() => refreshTavern(loadRoster(GENERAL_CONFIG) ?? createRoster(GENERAL_CONFIG), GENERAL_CONFIG))
   const [panel, setPanel] = useState(false)
+  const [leftOpen, setLeftOpen] = useState(false)
   const [now, setNow] = useState(Date.now())
   const deadlines = useRef<Map<string, { remaining: number; at: number }>>(new Map())
   const internalRef = useRef(internal)
@@ -418,12 +419,8 @@ export function CityScreen() {
     notify(`MOCK_發送${MOCK_CHAT_TABS.find((item) => item.id === chatTab)?.label ?? ""}`)
   }
 
-  // 版面：底欄固定 70 邏輯高；左欄 276 邏輯寬；其餘全給主城地圖。
-  const scale = Math.max(0.72, Math.min(vh / 720, 1.9))
-  const leftW = 276 * scale
-  const barH = 70 * scale
-  const mapW = Math.max(320, vw - leftW)
-  const mapH = Math.max(240, vh - barH)
+  // 版面：寬 ≥ 900 用橫向版（左欄 276＋底欄 70）；窄屏地圖鋪滿、左欄收抽屜、底欄兩排。
+  const { compact, scale, leftW, barH, mapW, mapH, drawerScale } = cityFrame(vw, vh)
   const profile = profileOf(vh > 950 ? 1920 : 1280)
   const v3frame = v3CoverFrame(0.4, { ...profile, screenW: mapW, screenH: mapH, safe: { x: 0, y: 0, w: mapW, h: mapH } })
 
@@ -431,6 +428,7 @@ export function CityScreen() {
 
   return (
     <div style={{ width: "100vw", height: "100vh", position: "relative", overflow: "hidden", background: STYLE.border, color: STYLE.text }}>
+      {compact ? null : (
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: leftW, overflow: "hidden" }}>
           <div style={{ position: "absolute", left: 0, top: 0, width: 276, height: 720, transform: `scale(${scale})`, transformOrigin: "0 0" }}>
             <LeftPanel
@@ -447,7 +445,71 @@ export function CityScreen() {
             />
           </div>
         </div>
-        <div style={{ position: "absolute", left: leftW, top: 0, width: mapW, height: mapH, overflow: "hidden" }}>
+      )}
+      {compact ? (
+        <>
+          {leftOpen ? (
+            <button
+              type="button"
+              aria-label="收起內政"
+              onClick={() => setLeftOpen(false)}
+              style={{ position: "absolute", inset: 0, zIndex: 28, background: "rgba(20, 14, 8, 0.55)", border: 0, padding: 0 }}
+            />
+          ) : null}
+          {leftOpen ? (
+            <div
+              data-ui-id="city_left_drawer"
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: 276 * drawerScale,
+                height: 720 * drawerScale,
+                zIndex: 30,
+                overflow: "hidden",
+                boxShadow: `4px 0 18px rgba(0, 0, 0, 0.45)`,
+              }}
+            >
+              <div style={{ position: "absolute", left: 0, top: 0, width: 276, height: 720, transform: `scale(${drawerScale})`, transformOrigin: "0 0" }}>
+                <LeftPanel
+                  profile={profile}
+                  tab={tab}
+                  log={log}
+                  onTab={setTab}
+                  onAction={leftAction}
+                  resources={resourceView}
+                  morale={Math.round(internal.morale)}
+                  taxLabel={rate.label}
+                  general={generalView}
+                  troops={troopView.map((row, index) => ({ ...row, id: GENERAL_CONFIG.troops[index]?.id ?? "" }))}
+                />
+              </div>
+            </div>
+          ) : null}
+          <button
+            type="button"
+            data-ui-id="city_left_toggle"
+            onClick={() => setLeftOpen(true)}
+            style={{
+              position: "absolute",
+              left: 8,
+              top: 8,
+              zIndex: 26,
+              background: STYLE.panel,
+              color: STYLE.gold,
+              border: `1px solid ${STYLE.gold}`,
+              fontFamily: STYLE.fontTitle,
+              fontSize: 13,
+              lineHeight: 1,
+              padding: "9px 12px",
+              cursor: "pointer",
+            }}
+          >
+            內政
+          </button>
+        </>
+      ) : null}
+      <div style={{ position: "absolute", left: leftW, top: 0, width: mapW, height: mapH, overflow: "hidden" }}>
           {skin === "v3" ? (
             <V3WorldLayer frame={v3frame} internal={internal} onAction={leftAction} scale={scale} focusId={focusId} />
           ) : (
@@ -685,6 +747,25 @@ export function CityScreen() {
           ) : null}
         </div>
       <div style={{ position: "absolute", left: leftW, bottom: 0, width: mapW, height: barH }}>
+        {compact ? (
+          <CompactBar
+            onAction={(message) => {
+              if (message === "MOCK_建築") {
+                openUpgrade("house")
+                return
+              }
+              if (message === "MOCK_競技") {
+                window.location.assign("/battle")
+                return
+              }
+              if (message === "MOCK_技能" || message === "MOCK_裝備") {
+                setPanel(true)
+                return
+              }
+              notify(message)
+            }}
+          />
+        ) : (
         <BottomBar
           scale={scale}
           chatTab={chatTab}
@@ -721,6 +802,7 @@ export function CityScreen() {
             notify(message)
           }}
         />
+        )}
       </div>
       {debug ? (
         <div style={{ position: "fixed", left: 8, top: 8, display: "flex", gap: 6, zIndex: 20, fontFamily: STYLE.fontTitle, fontSize: 12 }}>
@@ -732,6 +814,53 @@ export function CityScreen() {
           </span>
         </div>
       ) : null}
+    </div>
+  )
+}
+
+/** 窄屏底欄：兩排精簡格，唔再放 391 寬聊天欄同隊列，全部塞得入 320–900 寬。 */
+function CompactBar({ onAction }: { onAction: (message: string) => void }) {
+  const rows: readonly (readonly { label: string; message: string }[])[] = [
+    [
+      { label: "任務", message: "MOCK_任務" },
+      { label: "建築", message: "MOCK_建築" },
+      { label: "聯盟", message: "MOCK_聯盟" },
+      { label: "競技", message: "MOCK_競技" },
+      { label: "師徒", message: "MOCK_師徒" },
+    ],
+    [
+      { label: "組隊", message: "MOCK_組隊" },
+      { label: "論壇", message: "MOCK_論壇" },
+      { label: "幫助", message: "MOCK_幫助" },
+      { label: "充值", message: "MOCK_充值" },
+      { label: "商城", message: "MOCK_商城" },
+    ],
+  ]
+  return (
+    <div data-ui-id="city_compact_bar" style={{ display: "grid", gap: 4, padding: 4, height: "100%", boxSizing: "border-box", background: STYLE.panel, boxShadow: `inset 0 1px 0 ${STYLE.gold}` }}>
+      {rows.map((row, index) => (
+        <div key={index} style={{ display: "grid", gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))`, gap: 4 }}>
+          {row.map((cell) => (
+            <button
+              key={cell.label}
+              type="button"
+              onClick={() => onAction(cell.message)}
+              style={{
+                background: STYLE.panelRaise,
+                color: STYLE.text,
+                border: `1px solid ${STYLE.gold}`,
+                fontFamily: STYLE.fontValue,
+                fontSize: 12,
+                lineHeight: 1.2,
+                padding: "6px 0",
+                cursor: "pointer",
+              }}
+            >
+              {cell.label}
+            </button>
+          ))}
+        </div>
+      ))}
     </div>
   )
 }
