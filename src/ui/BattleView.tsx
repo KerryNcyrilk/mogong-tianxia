@@ -21,6 +21,8 @@ import { GENERAL_CONFIG } from "../general/config.ts"
 import { makeGeneral, statsOf } from "../general/engine.ts"
 import { BattleCanvas } from "./BattleCanvas.tsx"
 import { sfxClash, sfxDrum } from "./city/sfx.ts"
+import { PRESET_EVENT, loadPreset, presetToCss, type Board3DPreset } from "../dev/board3dPreset.ts"
+import { DevLab } from "./dev/DevLab.tsx"
 
 class CanvasBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false }
@@ -336,6 +338,14 @@ export function ExpeditionBoard({ squads, onFinish }: { squads: readonly Squad[]
 
 export function BattleView() {
   const [mode, setMode] = useState<"manual" | "auto">("manual")
+  const [lab, setLab] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).get("dev2a") === "1"
+    } catch {
+      return false
+    }
+  })
+  const labSlot = lab ? <DevLab onClose={() => setLab(false)} /> : null
   if (mode === "manual") {
     return (
       <div className="space-y-4">
@@ -348,10 +358,16 @@ export function BattleView() {
           </button>
         </div>
         <ManualBoard />
+        {labSlot}
       </div>
     )
   }
-  return <AutoBattle onManual={() => setMode("manual")} />
+  return (
+    <div>
+      <AutoBattle onManual={() => setMode("manual")} />
+      {labSlot}
+    </div>
+  )
 }
 
 function AutoBattle({ onManual }: { onManual: () => void }) {
@@ -501,12 +517,18 @@ function AutoBattle({ onManual }: { onManual: () => void }) {
 
 /** 2.5D 斜角棋盤：以 CSS perspective 把整塊棋盤按 34° 斜放，近大遠細。 */
 function Board3D({ children }: { children: ReactNode }) {
+  const [preset, setPreset] = useState<Board3DPreset>(() => loadPreset())
+  useEffect(() => {
+    const handler = () => setPreset(loadPreset())
+    window.addEventListener(PRESET_EVENT, handler)
+    return () => window.removeEventListener(PRESET_EVENT, handler)
+  }, [])
+  const css = presetToCss(preset)
   return (
-    <div style={{ perspective: "1500px", perspectiveOrigin: "50% 0%", padding: "4px 0 64px", overflow: "visible" }} data-ui-id="board_3d">
+    <div style={{ ...(css.wrapper as CSSProperties), overflow: "visible" }} data-ui-id="board_3d">
       <div
         style={{
-          transform: "rotateX(33deg) scale(0.9)",
-          transformOrigin: "50% 46%",
+          ...(css.board as CSSProperties),
           border: "1px solid #C8A96B",
           boxShadow: "0 22px 32px #1A120C",
         }}

@@ -1,0 +1,9 @@
+{
+  "schema": "board3d-preset.v1",
+  "preset": {
+    "perspective": 1800,
+    "rotateX": 42,
+    "scale": 1,
+    "lift": 8
+  }
+}
