@@ -23,6 +23,7 @@ import {
   type TroopId,
 } from "../../dev/devOverrides.ts"
 import { STYLE } from "../city/tokens.ts"
+import { DevBadFilePanel, DevBoard3DPanel, DevSandboxPanel, DevSimPanel } from "./DevLab.tsx"
 
 const LIVE: readonly { key: ResourceKey; label: string }[] = [
   { key: "coin", label: "刀幣" },
@@ -81,20 +82,20 @@ export function DevConsoleGate() {
 function DevConsole({ onClose }: { onClose: () => void }) {
   const bag = useSyncExternalStore(subscribeOverrides, readOverrides, readOverrides)
   const cityRev = useSyncExternalStore(subscribeCity, readCityRev, readCityRev)
-  const [tab, setTab] = useState<"city" | "balance">("city")
+  const [tab, setTab] = useState<"city" | "balance" | "sandbox" | "board3d" | "sim" | "badfile">(() => {
+    try {
+      const want = new URLSearchParams(window.location.search).get("v2tab")
+      if (want === "sandbox" || want === "board3d" || want === "sim" || want === "badfile") return want
+      return "city"
+    } catch {
+      return "city"
+    }
+  })
   const [collapsed, setCollapsed] = useState(false)
   const [note, setNote] = useState("")
   const [fallback, setFallback] = useState("")
   const bridge = cityBridge()
   void cityRev
-
-  const besideLab = (() => {
-    try {
-      return new URLSearchParams(window.location.search).get("dev2a") === "1"
-    } catch {
-      return false
-    }
-  })()
 
   async function copyDiff() {
     const text = JSON.stringify(overrideDiff(), null, 2)
@@ -128,7 +129,7 @@ function DevConsole({ onClose }: { onClose: () => void }) {
         onClick={() => setCollapsed(false)}
         style={{
           position: "fixed",
-          right: besideLab ? 320 : 0,
+          right: 0,
           top: "40%",
           zIndex: 80,
           writingMode: "vertical-rl",
@@ -162,9 +163,9 @@ function DevConsole({ onClose }: { onClose: () => void }) {
       style={{
         position: "fixed",
         top: 0,
-        right: besideLab ? 320 : 0,
+        right: 0,
         bottom: 0,
-        width: 380,
+        width: tab === "sandbox" ? 460 : 380,
         zIndex: 80,
         overflowY: "auto",
         background: STYLE.panel,
@@ -190,7 +191,7 @@ function DevConsole({ onClose }: { onClose: () => void }) {
         }}
       >
         <strong style={{ color: STYLE.gold, fontFamily: STYLE.fontTitle, fontSize: 14, marginRight: "auto" }}>
-          開發控制台 · V1
+          開發控制台 · V1＋V2A
         </strong>
         <button type="button" style={chip(true)} onClick={() => { resetOverrides(); setNote("係數已恢復預設") }}>
           恢復預設
@@ -210,14 +211,53 @@ function DevConsole({ onClose }: { onClose: () => void }) {
         ) : null}
       </header>
 
-      <div style={{ display: "flex", gap: 6, padding: "8px 12px 0" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, padding: "8px 12px 0" }}>
         <button type="button" style={chip(tab === "city")} onClick={() => setTab("city")}>
           內政與時間
         </button>
         <button type="button" style={chip(tab === "balance")} onClick={() => setTab("balance")}>
           數值平衡係數
         </button>
+        <button type="button" style={chip(tab === "sandbox")} onClick={() => setTab("sandbox")}>
+          戰棋沙盒
+        </button>
+        <button type="button" style={chip(tab === "board3d")} onClick={() => setTab("board3d")}>
+          2.5D
+        </button>
+        <button type="button" style={chip(tab === "sim")} onClick={() => setTab("sim")}>
+          AI 壓測
+        </button>
+        <button type="button" style={chip(tab === "badfile")} onClick={() => setTab("badfile")}>
+          壞檔
+        </button>
       </div>
+
+      {tab === "sandbox" ? (
+        <div style={{ padding: 12 }}>
+          <DevSandboxPanel initialStage={(() => {
+            try {
+              return new URLSearchParams(window.location.search).get("sbx") ?? undefined
+            } catch {
+              return undefined
+            }
+          })()} />
+        </div>
+      ) : null}
+      {tab === "board3d" ? (
+        <div style={{ padding: 12 }}>
+          <DevBoard3DPanel />
+        </div>
+      ) : null}
+      {tab === "sim" ? (
+        <div style={{ padding: 12 }}>
+          <DevSimPanel />
+        </div>
+      ) : null}
+      {tab === "badfile" ? (
+        <div style={{ padding: 12 }}>
+          <DevBadFilePanel />
+        </div>
+      ) : null}
 
       {tab === "city" ? (
         <div style={{ padding: 12 }}>
@@ -290,7 +330,7 @@ function DevConsole({ onClose }: { onClose: () => void }) {
             </button>
           </div>
         </div>
-      ) : (
+      ) : tab === "balance" ? (
         <div style={{ padding: 12 }}>
           <p style={{ margin: "0 0 8px", color: STYLE.textMuted }}>六項係數。改起始資源後要按「開新局」才寫進存檔。</p>
           {RESOURCE_KEYS.map((key) => {
@@ -422,7 +462,7 @@ function DevConsole({ onClose }: { onClose: () => void }) {
             匯出 balance-override.json
           </button>
         </div>
-      )}
+      ) : null}
     </aside>
   )
 }

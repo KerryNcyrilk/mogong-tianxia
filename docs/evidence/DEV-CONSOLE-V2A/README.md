@@ -47,3 +47,14 @@
 **證據索引**：`dev-lab-sandbox-s3.png`（S3 擺盤）、`dev-lab-sandbox-damage-log.png`（託管 30 步後 22 筆日誌）、`dev-lab-sandbox-cheats.png`（一擊必殺＋無敵，敵剩 4 隊）、`dev-lab-badfile.png`（壞檔面板）、`damage-log-s-qinying.json`（52 筆全量）、`sim-report-jitter08.json`。
 
 **未做（仍待 V1）**：把 `DevLab` 併入 V1 `DevConsole` 統一抽屜（Rowan 講明 V1 入 `main` 後我 rebase 落 `main` 再接 `DevConsole.tsx`）；2.5D 單位反向豎立／受擊震動／傷害飄字滑桿仍列 v2。
+
+## 第四階段：整併入 V1 統一抽屜（2026-11-27 14:0x，回應 `V2A-MERGE-INTO-V1`）
+`cursor/dev-console-v2a-part2` 已 rebase 至 `main@6cf705ff`（含 `DEV-CONSOLE-V1`／`PR #19`），`DevLab` 拆成面板後全部掛入 `src/ui/dev/DevConsole.tsx`：
+
+1. **單一入口**：只留 `?dev=1`／`Ctrl+Shift+D`／反引號（`DevConsoleGate` 在 `App` 全域）；刪掉 `?dev2a=1` 第二入口與 `BattleView` 的 `DevLab` 掛載、`besideLab` 右移邏輯。
+2. **六個分頁**：內政與時間／數值平衡係數（V1 原有）＋戰棋沙盒／2.5D／AI 壓測／壞檔（V2A）；沙盒分頁闊 460，其餘 380。
+3. **`src/ui/dev/DevLab.tsx`** 改為面板模組：`DevBoard3DPanel`（滑桿即寫 preset）、`DevSimPanel`（jitter 滑桿＋3/10/30 場＋報告匯出）、`DevBadFilePanel`（五例校驗）、`DevSandboxPanel`（`DevSandbox` 薄包裝，`?sbx=` 可指定開場關）。
+4. **證據用 URL**：`?dev=1&v2tab=sandbox&sbx=s_qinying&auto=22`、`?dev=1&v2tab=sim&sim=10&jitter=0.08`、`?dev=1&v2tab=board3d`、`?dev=1&v2tab=badfile`（`v2tab` 只揀分頁，不另開抽屜）。
+5. **Gate**（rebase 後全綠）：`vitest 152 passed`（V1 帶來 8 個新 it）／`city-check` 全 PASS（含 delivery）／`ui-check` 7 項 PASS／`v3-check` 15 區 0 overlap／`build ✓`／`no-syslog` 0 hits。紅線檔（`data/cityLayout.json`、`data/units.json`、`src/combat/**`）零改。
+
+**新增證據**：`dev-console-unified-sandbox.png`、`dev-console-unified-sim.png`、`dev-console-unified-badfile.png`、`dev-console-unified-board3d.png`。
