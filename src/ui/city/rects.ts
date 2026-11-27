@@ -84,3 +84,31 @@ export function worldBoxToScreen(box: ScreenBox, zoom: number, profile: UiProfil
     h: box.h * zoom * resScale,
   }
 }
+
+/**
+ * 主城版面自適應：寬 ≥ 900 走「左欄 276＋底欄 70」橫向版；窄屏收成
+ * 地圖鋪滿 + 左欄抽屜 + 兩排精簡底欄，任何寬高比都唔會留底圖被頂出畫面。
+ */
+export interface CityFrame {
+  compact: boolean
+  scale: number
+  leftW: number
+  barH: number
+  mapW: number
+  mapH: number
+  drawerScale: number
+}
+
+export const COMPACT_BREAKPOINT = 900
+
+export function cityFrame(vw: number, vh: number): CityFrame {
+  const compact = vw < COMPACT_BREAKPOINT
+  const fit = Math.min(vh / 720, vw / 1280)
+  const scale = compact ? Math.max(0.6, Math.min(vw / 720, vh / 1000, 1.2)) : Math.max(0.65, Math.min(fit, 1.9))
+  const leftW = compact ? 0 : 276 * scale
+  const barH = compact ? Math.round(Math.min(112, Math.max(86, vh * 0.135))) : 70 * scale
+  const mapW = compact ? vw : Math.max(320, vw - leftW)
+  const mapH = Math.max(200, vh - barH)
+  const drawerScale = compact ? Math.min((vh - barH) / 720, vw / 276) : scale
+  return { compact, scale, leftW, barH, mapW, mapH, drawerScale }
+}
