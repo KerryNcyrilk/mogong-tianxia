@@ -37,6 +37,17 @@ import {
 import type { RosterState } from "../../general/types.ts"
 import { STAGE_FILE, stageById } from "../../demo/stages.ts"
 import { recruitTroops } from "../../demo/recruit.ts"
+import {
+  applyStartResources,
+  bindCity,
+  cityHasListeners,
+  drillExpOf,
+  finishBuildQueue,
+  scaledTickSeconds,
+  takeRecruitJobs,
+  withResource,
+  bumpCity,
+} from "../../dev/devOverrides.ts"
 
 const TAX_ORDER: TaxRate["id"][] = ["low", "mid", "high"]
 
@@ -98,6 +109,10 @@ export function CityScreen() {
   const [panel, setPanel] = useState(false)
   const [now, setNow] = useState(Date.now())
   const deadlines = useRef<Map<string, { remaining: number; at: number }>>(new Map())
+  const internalRef = useRef(internal)
+  const rosterRef = useRef(roster)
+  internalRef.current = internal
+  rosterRef.current = roster
 
   // 開發者工具列：?debug=1 或 Ctrl+Shift+D
   useEffect(() => {
@@ -134,11 +149,20 @@ export function CityScreen() {
   }, [])
 
   // 內政 tick：1 秒結算；每 60 秒成長＋事件；完工自動入級。
+  // 時間倍率為 1 時走原來的 ticks % 60；大於 1 才按遊戲秒累積。
   useEffect(() => {
     let ticks = 0
+    let bank = 0
+    const takeMinutes = (seconds: number) => {
+      bank += seconds
+      const whole = Math.floor(bank / 60)
+      if (whole > 0) bank -= whole * 60
+      return whole
+    }
     const timer = window.setInterval(() => {
       setInternal((current) => {
-        let next = tick(current, INTERNAL_CONFIG, INTERNAL_CONFIG.tickSeconds)
+        const seconds = scaledTickSeconds(INTERNAL_CONFIG.tickSeconds)
+        let next = tick(current, INTERNAL_CONFIG, seconds)
         ticks += 1
         for (const slot of next.slots) {
           if (slot.status === "done") {
@@ -149,16 +173,20 @@ export function CityScreen() {
             }
           }
         }
-        if (ticks % 60 === 0) {
-          setRoster((current) => {
-            let grown = current
-            for (const slot of current.formation) {
-              if (slot.generalId) grown = gainExp(grown, slot.generalId, 12, GENERAL_CONFIG).state
-            }
-            saveRoster(grown)
-            return grown
-          })
-          const rolled = rollEvents(next, INTERNAL_CONFIG, 1)
+        const pulses = seconds === INTERNAL_CONFIG.tickSeconds ? (ticks % 60 === 0 ? 1 : 0) : takeMinutes(seconds)
+        if (pulses > 0) {
+          const grant = drillExpOf(12) * pulses
+          if (grant > 0) {
+            setRoster((roster) => {
+              let grown = roster
+              for (const slot of roster.formation) {
+                if (slot.generalId) grown = gainExp(grown, slot.generalId, grant, GENERAL_CONFIG).state
+              }
+              saveRoster(grown)
+              return grown
+            })
+          }
+          const rolled = rollEvents(next, INTERNAL_CONFIG, pulses)
           next = rolled.state
           if (__SYSLOG__) {
             for (const event of rolled.events) sysLog.warn("internal", "internal.event.fire", event)
@@ -174,6 +202,84 @@ export function CityScreen() {
     }, 1000)
     return () => window.clearInterval(timer)
   }, [])
+
+  useEffect(() => {
+    return bindCity({
+      resources: () => internalRef.current.resources,
+      slots: () => internalRef.current.slots,
+      setResource: (key, value) => {
+        setInternal((current) => {
+          const next = withResource(current, INTERNAL_CONFIG, key, value)
+          save(next)
+          markSaved()
+          return next
+        })
+      },
+      addResource: (key, delta) => {
+        setInternal((current) => {
+          const next = withResource(current, INTERNAL_CONFIG, key, current.resources[key] + delta)
+          save(next)
+          markSaved()
+          return next
+        })
+      },
+      finishBuild: () => {
+        setInternal((current) => {
+          const result = finishBuildQueue(current)
+          if (result.finished === 0) return current
+          save(result.state)
+          markSaved()
+          return result.state
+        })
+      },
+      finishRecruit: () => {
+        const pending = takeRecruitJobs()
+        if (pending.length === 0) return
+        let roster = rosterRef.current
+        let nextInternal = internalRef.current
+        for (const job of pending) {
+          const result = recruitTroops(roster, nextInternal, GENERAL_CONFIG, INTERNAL_CONFIG, job.unit, job.amount)
+          if (!result.ok) continue
+          roster = result.roster
+          nextInternal = result.internal
+        }
+        setRoster(roster)
+        saveRoster(roster)
+        setInternal(nextInternal)
+        save(nextInternal)
+        markSaved()
+      },
+      simulateOffline: (seconds) => {
+        const current = internalRef.current
+        const next = tick(current, INTERNAL_CONFIG, seconds)
+        const rows = INTERNAL_CONFIG.resources
+          .map((def) => ({
+            key: def.key,
+            label: def.name,
+            gain: Math.floor(next.resources[def.key] - current.resources[def.key]),
+          }))
+          .filter((row) => row.gain > 0)
+        setInternal(next)
+        setOffline({ seconds, rows, state: next })
+        save(next)
+        markSaved()
+      },
+      newGame: () => {
+        const fresh = applyStartResources(createState(INTERNAL_CONFIG))
+        const nextRoster = refreshTavern(createRoster(GENERAL_CONFIG), GENERAL_CONFIG)
+        setInternal(fresh)
+        setRoster(nextRoster)
+        save(fresh)
+        saveRoster(nextRoster)
+        markSaved()
+      },
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!cityHasListeners()) return
+    bumpCity()
+  }, [internal, roster])
 
   // 250ms 心跳：讓倒數以 endTime 為準平滑遞減（每秒一跳，唔再 2 秒跳一次）。
   useEffect(() => {
@@ -443,7 +549,8 @@ export function CityScreen() {
               onRecruit={(unit, amount) => {
                 const result = recruitTroops(roster, internal, GENERAL_CONFIG, INTERNAL_CONFIG, unit, amount)
                 if (!result.ok) {
-                  setRecruitNotice(`徵兵失敗：${result.reason === "no-resource" ? "資源不足" : result.reason === "pop-cap" ? "人口上限" : "未知兵種"}（需刀幣 ${result.cost?.coin ?? 0}／糧 ${result.cost?.food ?? 0}／人口 ${result.cost?.pop ?? 0}）`)
+                  const ironNote = result.cost?.iron ? `／生鐵 ${result.cost.iron}` : ""
+                  setRecruitNotice(`徵兵失敗：${result.reason === "no-resource" ? "資源不足" : result.reason === "pop-cap" ? "人口上限" : "未知兵種"}（需刀幣 ${result.cost?.coin ?? 0}／糧 ${result.cost?.food ?? 0}／人口 ${result.cost?.pop ?? 0}${ironNote}）`)
                   notify("徵兵失敗：資源或人口不足")
                   return
                 }

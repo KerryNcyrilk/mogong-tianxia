@@ -1,5 +1,6 @@
 import { BattleView } from "./ui/BattleView.tsx"
 import { CityScreen } from "./ui/city/CityScreen.tsx"
+import { DevConsoleGate } from "./ui/dev/DevConsole.tsx"
 
 /** 根路由直接入主城；戰鬥改由 /battle（及主城「出城／校場」入口）進入。 */
 function route(): "city" | "battle" {
@@ -8,6 +9,15 @@ function route(): "city" | "battle" {
 }
 
 export default function App() {
+  return (
+    <>
+      <AppBody />
+      <DevConsoleGate />
+    </>
+  )
+}
+
+function AppBody() {
   if (route() === "city") return <CityScreen />
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">

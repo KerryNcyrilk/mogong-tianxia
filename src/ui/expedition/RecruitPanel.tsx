@@ -2,6 +2,7 @@ import { STYLE } from "../city/tokens.ts"
 import { GENERAL_CONFIG } from "../../general/config.ts"
 import { INTERNAL_CONFIG } from "../../internal/config.ts"
 import { RECRUIT_BATCH, RECRUIT_COST, troopCapOf } from "../../demo/recruit.ts"
+import { overridesIdle, priceRecruit } from "../../dev/devOverrides.ts"
 import type { RosterState } from "../../general/types.ts"
 import type { InternalState } from "../../internal/types.ts"
 
@@ -67,6 +68,8 @@ export function RecruitPanel({
       {GENERAL_CONFIG.troops.map((troupe) => {
         const current = Math.floor(roster.troops[troupe.id] ?? 0)
         const cap = troopCapOf(INTERNAL_CONFIG)
+        const quote = overridesIdle() ? null : priceRecruit(troupe.id, 1)
+        const priced = quote !== null && (quote.coin !== RECRUIT_COST.coin || quote.food !== RECRUIT_COST.food || quote.iron > 0)
         return (
           <div
             key={troupe.id}
@@ -84,6 +87,12 @@ export function RecruitPanel({
               {current}／{Number.isFinite(cap) ? cap : "∞"}
             </span>
             <span style={{ color: STYLE.textMuted }}>最多 {RECRUIT_BATCH * 5}</span>
+            {priced && quote ? (
+              <span style={{ color: STYLE.complete }}>
+                本批 刀幣 {quote.coin} 糧 {quote.food}
+                {quote.iron > 0 ? ` 鐵 ${quote.iron}` : ""}
+              </span>
+            ) : null}
             {[RECRUIT_BATCH, RECRUIT_BATCH * 5].map((amount) => (
               <button
                 key={amount}
