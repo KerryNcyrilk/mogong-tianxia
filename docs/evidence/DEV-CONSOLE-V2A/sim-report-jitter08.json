@@ -1,0 +1,129 @@
+{
+  "schema": "sim-report.v1",
+  "createdAt": "2026-11-27T05:32:29.481Z",
+  "config": {
+    "games": 10,
+    "scenario": "sandbox/default-12x8",
+    "engine": "combat/battle.auto",
+    "seed": 20261127,
+    "jitter": 0.08
+  },
+  "games": [
+    {
+      "index": 0,
+      "seed": 20261127,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 688,
+      "qinHp": 421.80000000000007,
+      "moLossRate": 45.22,
+      "qinLossRate": 57.9
+    },
+    {
+      "index": 1,
+      "seed": 20261134,
+      "turns": 8,
+      "winner": "attacker",
+      "moHp": 581.8,
+      "qinHp": 0,
+      "moLossRate": 53.68,
+      "qinLossRate": 100
+    },
+    {
+      "index": 2,
+      "seed": 20261141,
+      "turns": 7,
+      "winner": "attacker",
+      "moHp": 634.8000000000001,
+      "qinHp": 0,
+      "moLossRate": 49.46,
+      "qinLossRate": 100
+    },
+    {
+      "index": 3,
+      "seed": 20261148,
+      "turns": 6,
+      "winner": "attacker",
+      "moHp": 629.4,
+      "qinHp": 0,
+      "moLossRate": 49.89,
+      "qinLossRate": 100
+    },
+    {
+      "index": 4,
+      "seed": 20261155,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 268,
+      "qinHp": 551,
+      "moLossRate": 78.66,
+      "qinLossRate": 45.01
+    },
+    {
+      "index": 5,
+      "seed": 20261162,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 408,
+      "qinHp": 565.4,
+      "moLossRate": 67.52,
+      "qinLossRate": 43.57
+    },
+    {
+      "index": 6,
+      "seed": 20261169,
+      "turns": 5,
+      "winner": "attacker",
+      "moHp": 687,
+      "qinHp": 0,
+      "moLossRate": 45.3,
+      "qinLossRate": 100
+    },
+    {
+      "index": 7,
+      "seed": 20261176,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 537,
+      "qinHp": 566.8000000000001,
+      "moLossRate": 57.25,
+      "qinLossRate": 43.43
+    },
+    {
+      "index": 8,
+      "seed": 20261183,
+      "turns": 4,
+      "winner": "attacker",
+      "moHp": 863.3,
+      "qinHp": 0,
+      "moLossRate": 31.27,
+      "qinLossRate": 100
+    },
+    {
+      "index": 9,
+      "seed": 20261190,
+      "turns": 9,
+      "winner": "defender",
+      "moHp": 0,
+      "qinHp": 518,
+      "moLossRate": 100,
+      "qinLossRate": 48.3
+    }
+  ],
+  "winRate": {
+    "mo": 50,
+    "qin": 50,
+    "draw": 0
+  },
+  "avgTurns": 9.9,
+  "lossRate": {
+    "mo": 57.8,
+    "qin": 73.8
+  },
+  "stdDev": {
+    "turns": 4.61,
+    "moLossRate": 19.66,
+    "qinLossRate": 27.89
+  },
+  "deterministic": false
+}

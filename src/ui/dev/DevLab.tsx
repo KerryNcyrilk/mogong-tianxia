@@ -10,6 +10,8 @@ import {
   type Board3DPreset,
 } from "../../dev/board3dPreset.ts"
 import { reportJson, runSimulation, type SimReport } from "../../dev/simulate.ts"
+import { DevSandbox } from "./DevSandbox.tsx"
+import { corruptSaves, validateSave } from "../../dev/timeMachine.ts"
 
 /** DEV-CONSOLE-V2A 自立外殼：只有 `?dev2a=1` 才掛載，不依賴 V1 抽屜。 */
 export function DevLab({ onClose }: { onClose: () => void }) {
@@ -27,6 +29,17 @@ export function DevLab({ onClose }: { onClose: () => void }) {
     }
   })
   const [busy, setBusy] = useState(false)
+  const [tab, setTab] = useState<"board3d" | "sim" | "sandbox" | "badfile">(() => {
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const want = params.get("tab")
+      if (want === "sandbox" || want === "sim" || want === "badfile") return want
+      return params.get("sbx") ? "sandbox" : "board3d"
+    } catch {
+      return "board3d"
+    }
+  })
+  const [badIndex, setBadIndex] = useState(0)
 
   function update(patch: Partial<Board3DPreset>) {
     const next = clampPreset({ ...preset, ...patch })
@@ -52,7 +65,7 @@ export function DevLab({ onClose }: { onClose: () => void }) {
         right: 10,
         top: 10,
         bottom: 10,
-        width: 300,
+        width: tab === "sandbox" ? 420 : 300,
         overflowY: "auto",
         background: "#1A120C",
         color: "#E8DCC0",
@@ -72,6 +85,46 @@ export function DevLab({ onClose }: { onClose: () => void }) {
         </button>
       </div>
 
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+        {(
+          [
+            ["board3d", "2.5D"],
+            ["sim", "壓測"],
+            ["sandbox", "沙盒"],
+            ["badfile", "壞檔"],
+          ] as const
+        ).map(([key, label]) => (
+          <button key={key} type="button" onClick={() => setTab(key)} style={chip(tab === key)}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "sandbox" ? (
+        <section style={{ marginTop: 10 }}>
+          <DevSandbox initialStage={new URLSearchParams(window.location.search).get("sbx") ?? undefined} />
+        </section>
+      ) : tab === "badfile" ? (
+        <section style={{ marginTop: 10 }}>
+          <p style={{ margin: "0 0 4px", color: "#9C8F78" }}>存檔壞檔測試（貼入真實 base64 存檔）</p>
+          {corruptSaves().map((row, index) => (
+            <div key={row.label} style={{ marginBottom: 4 }}>
+              <button type="button" onClick={() => setBadIndex(index)} style={chip(badIndex === index)}>
+                {row.label}
+              </button>
+            </div>
+          ))}
+          <p style={{ margin: "4px 0 0" }}>
+            {(() => {
+              const row = corruptSaves()[badIndex]
+              const result = validateSave(row.text)
+              return `${result.ok ? "通過" : "拒絕"}｜${result.errors.join("；") || "無錯誤"}｜預期：${row.expect}`
+            })()}
+          </p>
+        </section>
+      ) : null}
+
+      {tab === "board3d" ? (
       <section style={{ marginTop: 10 }}>
         <p style={{ margin: "0 0 4px", color: "#9C8F78" }}>2.5D Board3D 參數</p>
         {(
@@ -107,7 +160,9 @@ export function DevLab({ onClose }: { onClose: () => void }) {
           </button>
         </div>
       </section>
+      ) : null}
 
+      {tab === "sim" || tab === "board3d" ? (
       <section style={{ marginTop: 14 }}>
         <p style={{ margin: "0 0 4px", color: "#9C8F78" }}>AI 壓測模擬器</p>
         <label style={{ display: "block", marginBottom: 6 }}>
@@ -168,6 +223,7 @@ export function DevLab({ onClose }: { onClose: () => void }) {
           <p style={{ margin: "8px 0 0", color: "#9C8F78" }}>未跑；預設 S1 沙盒同配置。</p>
         )}
       </section>
+      ) : null}
     </aside>
   )
 }
