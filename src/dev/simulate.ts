@@ -26,6 +26,9 @@ export interface SimReport {
   deterministic: boolean
 }
 
+/** 默認開局擾動（Gemini 20261127-1309 拍板 0.08：日常平衡驗收用溫和浮動）。 */
+export const DEFAULT_JITTER = 0.08
+
 export interface SimOptions {
   /** 起始種子；同 seed＋同 jitter＝完全可重現。 */
   seed?: number
@@ -87,7 +90,7 @@ function runOne(squads: readonly Squad[], index: number, seed: number, jitter: n
 export function runSimulation(games = 10, options: SimOptions = {}): SimReport {
   const squads = createScenario()
   const baseSeed = options.seed ?? 20261127
-  const jitter = Math.max(0, Math.min(0.3, options.jitter ?? 0))
+  const jitter = Math.max(0, Math.min(0.3, options.jitter ?? DEFAULT_JITTER))
   const rows: SimGame[] = []
   for (let index = 0; index < Math.max(1, Math.min(200, games)); index += 1) {
     rows.push(runOne(squads, index, baseSeed + index * 7, jitter))

@@ -22,7 +22,6 @@ import { BattleCanvas } from "./BattleCanvas.tsx"
 import { sfxClash, sfxDrum } from "./city/sfx.ts"
 import { adjustBoardHit, stepAutoBoard } from "../dev/boardTune.ts"
 import { PRESET_EVENT, loadPreset, presetToCss, type Board3DPreset } from "../dev/board3dPreset.ts"
-import { DevLab } from "./dev/DevLab.tsx"
 
 class CanvasBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false }
@@ -338,14 +337,6 @@ export function ExpeditionBoard({ squads, onFinish }: { squads: readonly Squad[]
 
 export function BattleView() {
   const [mode, setMode] = useState<"manual" | "auto">("manual")
-  const [lab, setLab] = useState(() => {
-    try {
-      return new URLSearchParams(window.location.search).get("dev2a") === "1"
-    } catch {
-      return false
-    }
-  })
-  const labSlot = lab ? <DevLab onClose={() => setLab(false)} /> : null
   if (mode === "manual") {
     return (
       <div className="space-y-4">
@@ -358,14 +349,12 @@ export function BattleView() {
           </button>
         </div>
         <ManualBoard />
-        {labSlot}
       </div>
     )
   }
   return (
     <div>
       <AutoBattle onManual={() => setMode("manual")} />
-      {labSlot}
     </div>
   )
 }
