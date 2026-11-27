@@ -9,6 +9,8 @@ export interface V3Zone {
   label: string
   kind: string
   levelKind?: string
+  /** 城外資源點用固定等級牌（唔跟內政等級走）。 */
+  fixedLevel?: number
   action: string
   tag?: string
   badge: [number, number]

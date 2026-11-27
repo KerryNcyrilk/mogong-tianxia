@@ -20,6 +20,7 @@ import type { Squad } from "../combat/types.ts"
 import { GENERAL_CONFIG } from "../general/config.ts"
 import { makeGeneral, statsOf } from "../general/engine.ts"
 import { BattleCanvas } from "./BattleCanvas.tsx"
+import { sfxClash, sfxDrum } from "./city/sfx.ts"
 
 class CanvasBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false }
@@ -136,6 +137,8 @@ function ManualBoard({ squads, onFinish }: { squads?: readonly Squad[]; onFinish
       return
     }
     setBoard(result.state)
+    if (command.type === "attack" || command.type === "skill") sfxClash()
+    if (result.state.over) sfxDrum()
     setNotice("")
   }
 
@@ -186,6 +189,7 @@ function ManualBoard({ squads, onFinish }: { squads?: readonly Squad[]; onFinish
           </div>
           <p className="text-sm text-[#3d3832]">{status}</p>
         </div>
+        <Board3D>
         <CanvasBoundary>
           <BattleCanvas
             squads={squadList}
@@ -195,6 +199,7 @@ function ManualBoard({ squads, onFinish }: { squads?: readonly Squad[]; onFinish
             attackCells={attackCells}
           />
         </CanvasBoundary>
+        </Board3D>
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <button
             type="button"
@@ -391,9 +396,11 @@ function AutoBattle({ onManual }: { onManual: () => void }) {
             第 {battle.turn} 回合　墨方 {formatDamage(attackerHp)}　秦方 {formatDamage(defenderHp)}
           </p>
         </div>
-        <CanvasBoundary>
-          <BattleCanvas squads={battle.squads} highlightId={highlightId} />
-        </CanvasBoundary>
+        <Board3D>
+          <CanvasBoundary>
+            <BattleCanvas squads={battle.squads} highlightId={highlightId} />
+          </CanvasBoundary>
+        </Board3D>
         <p className="text-xs tracking-wide text-[#7c312c]">佔位美術，正式圖由行術替換 src/art/manifest.ts 的 src。</p>
         <ol
           className="flex flex-wrap gap-2 rounded-md border border-dashed border-[#7c312c]/60 p-2 text-sm"
@@ -488,6 +495,24 @@ function AutoBattle({ onManual }: { onManual: () => void }) {
           )}
         </div>
       </aside>
+    </div>
+  )
+}
+
+/** 2.5D 斜角棋盤：以 CSS perspective 把整塊棋盤按 34° 斜放，近大遠細。 */
+function Board3D({ children }: { children: ReactNode }) {
+  return (
+    <div style={{ perspective: "1500px", perspectiveOrigin: "50% 0%", padding: "4px 0 64px", overflow: "visible" }} data-ui-id="board_3d">
+      <div
+        style={{
+          transform: "rotateX(33deg) scale(0.9)",
+          transformOrigin: "50% 46%",
+          border: "1px solid #C8A96B",
+          boxShadow: "0 22px 32px #1A120C",
+        }}
+      >
+        {children}
+      </div>
     </div>
   )
 }
