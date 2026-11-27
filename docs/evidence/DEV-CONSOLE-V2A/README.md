@@ -13,6 +13,11 @@
 ## Gate（全綠）
 `vitest 129 passed`／`city-check` 全 PASS／`ui-check 7 項 PASS`／`v3-check 15 區 0 overlap`／`build ✓`／`no-syslog 0 hits`；紅線 `cityLayout.json`／`units.json` 零改。
 
+## 第二階段（本輪新增，回應 VERDICT-V2A-PARTIAL-ACCEPT）
+- `simulate.ts` 加 `seed`＋`jitter`（0–0.3 攻防擾動，`mulberry32` 可重現）；報告加 `stdDev`（回合／雙方戰損）與 `deterministic` 旗標；`DevLab` 加擾動滑桿；`?sim=N&jitter=0.15` 證據參數。
+- 實測（seed 20261127、jitter 0.15、10 場）：墨勝 50%／秦勝 50%，平均 9 回合；標準差 回合 ±5.21、墨損 ±28.99、秦損 ±29.67 → `sim-report-jitter15.json`、`dev-lab-jitter-seed.png`。
+- 測試增至 `vitest 131`（可重現性、確定性 stdDev=0 兩項）。
+
 ## 觀察（供 Gemini 判平衡）
 `sim-report.json`：10 場全為「秦勝 100%」，墨方戰損 49.5%、秦方 64.5%，平均 15 回合。因自動引擎為確定性，10 場結果完全相同——即現時沙盒配置下墨方必敗；若要看分佈需加隨機種子（列下一階段）。
 

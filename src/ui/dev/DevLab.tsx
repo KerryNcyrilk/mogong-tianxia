@@ -14,11 +14,14 @@ import { reportJson, runSimulation, type SimReport } from "../../dev/simulate.ts
 /** DEV-CONSOLE-V2A 自立外殼：只有 `?dev2a=1` 才掛載，不依賴 V1 抽屜。 */
 export function DevLab({ onClose }: { onClose: () => void }) {
   const [preset, setPreset] = useState<Board3DPreset>(() => loadPreset())
+  const [jitter, setJitter] = useState(0.08)
   const [report, setReport] = useState<SimReport | null>(() => {
     // 證據／自動化：?sim=10 直接跑一次（唔靠人手點擊）
     try {
-      const count = Number(new URLSearchParams(window.location.search).get("sim") ?? 0)
-      return count > 0 ? runSimulation(count) : null
+      const params = new URLSearchParams(window.location.search)
+      const count = Number(params.get("sim") ?? 0)
+      const level = Number(params.get("jitter") ?? 0.08)
+      return count > 0 ? runSimulation(count, { jitter: level }) : null
     } catch {
       return null
     }
@@ -107,6 +110,21 @@ export function DevLab({ onClose }: { onClose: () => void }) {
 
       <section style={{ marginTop: 14 }}>
         <p style={{ margin: "0 0 4px", color: "#9C8F78" }}>AI 壓測模擬器</p>
+        <label style={{ display: "block", marginBottom: 6 }}>
+          <span style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>開局擾動（±{Math.round(jitter * 100)}% 攻防）</span>
+            <span style={{ color: "#C8A96B" }}>{jitter === 0 ? "確定性" : "隨機"}</span>
+          </span>
+          <input
+            type="range"
+            min={0}
+            max={0.3}
+            step={0.01}
+            value={jitter}
+            onChange={(event) => setJitter(Number(event.target.value))}
+            style={{ width: "100%" }}
+          />
+        </label>
         <div style={{ display: "flex", gap: 6 }}>
           {[3, 10, 30].map((count) => (
             <button
@@ -115,7 +133,7 @@ export function DevLab({ onClose }: { onClose: () => void }) {
               disabled={busy}
               onClick={() => {
                 setBusy(true)
-                const result = runSimulation(count)
+                const result = runSimulation(count, { jitter })
                 setReport(result)
                 setBusy(false)
               }}
@@ -132,6 +150,12 @@ export function DevLab({ onClose }: { onClose: () => void }) {
             </p>
             <p style={{ margin: 0 }}>平均回合 {report.avgTurns}</p>
             <p style={{ margin: 0 }}>墨戰損 {report.lossRate.mo}% · 秦戰損 {report.lossRate.qin}%</p>
+            <p style={{ margin: 0 }}>
+              標準差：回合 ±{report.stdDev.turns} · 墨損 ±{report.stdDev.moLossRate} · 秦損 ±{report.stdDev.qinLossRate}
+            </p>
+            <p style={{ margin: 0, color: report.deterministic ? "#9C8F78" : "#6E8B4F" }}>
+              {report.deterministic ? "確定性模式（10 場應完全一致）" : `隨機模式 · seed ${report.config.seed}`}
+            </p>
             <button
               type="button"
               onClick={() => download("sim-report.json", reportJson(report))}

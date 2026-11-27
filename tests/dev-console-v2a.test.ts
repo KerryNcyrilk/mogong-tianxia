@@ -40,6 +40,22 @@ describe("simulate（V2A）", () => {
     expect(first.games.every((row) => row.moLossRate >= 0 && row.moLossRate <= 100)).toBe(true)
   })
 
+  it("隨機擾動：勝率有分佈、標準差 > 0，同 seed 可重現", () => {
+    const a = runSimulation(10, { seed: 42, jitter: 0.15 })
+    const b = runSimulation(10, { seed: 42, jitter: 0.15 })
+    expect(a.deterministic).toBe(false)
+    expect(a.games.map((row) => row.winner)).toEqual(b.games.map((row) => row.winner))
+    expect(a.stdDev.turns).toBeGreaterThan(0)
+    expect(a.games.every((row) => Number.isInteger(row.seed))).toBe(true)
+  })
+
+  it("確定性模式：stdDev 為 0、10 場一致", () => {
+    const report = runSimulation(4, { jitter: 0 })
+    expect(report.deterministic).toBe(true)
+    expect(new Set(report.games.map((row) => row.winner)).size).toBe(1)
+    expect(report.stdDev.turns).toBe(0)
+  })
+
   it("JSON 匯出含 config 與匯總", () => {
     const report = JSON.parse(reportJson(runSimulation(3))) as { config: { games: number }; avgTurns: number }
     expect(report.config.games).toBe(3)
