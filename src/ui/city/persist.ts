@@ -3,12 +3,12 @@ import { tick } from "../../internal/engine.ts"
 import type { InternalState } from "../../internal/types.ts"
 import type { RosterState } from "../../general/types.ts"
 
-const LAST_AT = "mogong.internal.lastAt"
+export const LAST_AT_KEY = "mogong.internal.lastAt"
 const OFFLINE_CAP_HOURS = 12
 
 export function markSaved(at = Date.now()): void {
   try {
-    localStorage.setItem(LAST_AT, String(at))
+    localStorage.setItem(LAST_AT_KEY, String(at))
   } catch {
     // 私隱模式忽略
   }
@@ -24,7 +24,7 @@ export interface OfflineReport {
 export function settleOffline(state: InternalState): OfflineReport | null {
   let last = 0
   try {
-    last = Number(localStorage.getItem(LAST_AT) ?? 0)
+    last = Number(localStorage.getItem(LAST_AT_KEY) ?? 0)
   } catch {
     last = 0
   }

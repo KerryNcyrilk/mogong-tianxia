@@ -103,6 +103,8 @@ export function CityScreen() {
   const [mute, setMuteState] = useState<boolean>(sfxMuted)
   const [saveOpen, setSaveOpen] = useState<boolean>(param("save") === "1")
   const [offline, setOffline] = useState<OfflineReport | null>(null)
+  const [upgradePreview, setUpgradePreview] = useState<InternalState | null>(null)
+  const [upgradeForce, setUpgradeForce] = useState<string | null>(null)
   const offlineDone = useRef(false)
   const [internal, setInternal] = useState<InternalState>(() => load(INTERNAL_CONFIG) ?? createState(INTERNAL_CONFIG))
   const [roster, setRoster] = useState<RosterState>(() => refreshTavern(loadRoster(GENERAL_CONFIG) ?? createRoster(GENERAL_CONFIG), GENERAL_CONFIG))
@@ -273,6 +275,15 @@ export function CityScreen() {
         saveRoster(nextRoster)
         markSaved()
       },
+      notify: (text) => notify(text),
+      previewUpgrade: (mode) => {
+        void import("../../dev/v2b/upgradePreview.ts").then(({ buildUpgradePreview }) => {
+          const preview = buildUpgradePreview(internalRef.current, mode)
+          setUpgradePreview(preview.state)
+          setUpgradeForce(preview.forceReason)
+          setUpgradeKind(preview.kind)
+        })
+      },
     })
   }, [])
 
@@ -332,6 +343,8 @@ export function CityScreen() {
   function openUpgrade(kind: string) {
     const building = INTERNAL_CONFIG.buildings.find((item) => item.kind === kind)
     if (!building) return
+    setUpgradePreview(null)
+    setUpgradeForce(null)
     setUpgradeKind(kind)
   }
 
@@ -564,7 +577,18 @@ export function CityScreen() {
             />
           ) : null}
           {upgradeBuilding ? (
-            <UpgradeDialog building={upgradeBuilding} internal={internal} scale={scale} onConfirm={confirmUpgrade} onClose={() => setUpgradeKind(null)} />
+            <UpgradeDialog
+              building={upgradeBuilding}
+              internal={upgradePreview ?? internal}
+              scale={scale}
+              forceReason={upgradeForce}
+              onConfirm={confirmUpgrade}
+              onClose={() => {
+                setUpgradeKind(null)
+                setUpgradePreview(null)
+                setUpgradeForce(null)
+              }}
+            />
           ) : null}
           {saveOpen ? (
             <SavePanel
