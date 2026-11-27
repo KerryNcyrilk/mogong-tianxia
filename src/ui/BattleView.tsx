@@ -5,7 +5,6 @@ import { createBattle, isAlive, sideHp, step, type BattleState } from "../combat
 import {
   activeUnitId,
   applyCommand,
-  autoTurn,
   createBoard,
   reachable,
   retreat,
@@ -21,6 +20,7 @@ import { GENERAL_CONFIG } from "../general/config.ts"
 import { makeGeneral, statsOf } from "../general/engine.ts"
 import { BattleCanvas } from "./BattleCanvas.tsx"
 import { sfxClash, sfxDrum } from "./city/sfx.ts"
+import { adjustBoardHit, stepAutoBoard } from "../dev/boardTune.ts"
 import { PRESET_EVENT, loadPreset, presetToCss, type Board3DPreset } from "../dev/board3dPreset.ts"
 import { DevLab } from "./dev/DevLab.tsx"
 
@@ -103,7 +103,7 @@ function ManualBoard({ squads, onFinish }: { squads?: readonly Squad[]; onFinish
   useEffect(() => {
     if (!board.auto || board.over) return
     const timer = window.setInterval(() => {
-      setBoard((current) => (current.over ? current : autoTurn({ ...current, auto: true }).state))
+      setBoard((current) => (current.over ? current : stepAutoBoard(current)))
     }, 600)
     return () => window.clearInterval(timer)
   }, [board.auto, board.over])
@@ -138,7 +138,7 @@ function ManualBoard({ squads, onFinish }: { squads?: readonly Squad[]; onFinish
       setNotice(REASON_TEXT[result.reason ?? ""] ?? "這一步不成立。")
       return
     }
-    setBoard(result.state)
+    setBoard(adjustBoardHit(board, result))
     if (command.type === "attack" || command.type === "skill") sfxClash()
     if (result.state.over) sfxDrum()
     setNotice("")

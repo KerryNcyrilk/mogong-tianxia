@@ -1,6 +1,7 @@
 import type { GeneralConfig, RosterState } from "../general/types.ts"
 import type { InternalConfig, InternalState } from "../internal/types.ts"
 import { capOf } from "../internal/engine.ts"
+import { overridesIdle, priceRecruit } from "../dev/devOverrides.ts"
 
 /**
  * B7 §2.1 徵兵：每 100 兵＝刀幣 300＋糧食 120＋人口 1。
@@ -29,18 +30,22 @@ export function recruitTroops(
   internal: InternalState
   ok: boolean
   reason?: "no-resource" | "pop-cap" | "unknown-unit"
-  cost?: { coin: number; food: number; pop: number }
+  cost?: { coin: number; food: number; pop: number; iron?: number }
   added?: number
 } {
   if (!config.troops.some((row) => row.id === unit)) return { roster, internal, ok: false, reason: "unknown-unit" }
   const batches = Math.max(1, Math.floor(amount / RECRUIT_BATCH))
   const added = batches * RECRUIT_BATCH
-  const cost = { coin: RECRUIT_COST.coin * batches, food: RECRUIT_COST.food * batches, pop: RECRUIT_COST.pop * batches }
+  const priced = overridesIdle() ? null : priceRecruit(unit, batches)
+  const cost = priced
+    ? { coin: priced.coin, food: priced.food, pop: priced.pop, iron: priced.iron }
+    : { coin: RECRUIT_COST.coin * batches, food: RECRUIT_COST.food * batches, pop: RECRUIT_COST.pop * batches }
+  const iron = priced?.iron ?? 0
 
   const current = Math.floor(roster.troops[unit] ?? 0)
   if (current + added > troopCapOf(internalConfig)) return { roster, internal, ok: false, reason: "pop-cap", cost }
   if (internal.resources.pop < cost.pop) return { roster, internal, ok: false, reason: "pop-cap", cost }
-  if (internal.resources.coin < cost.coin || internal.resources.food < cost.food) {
+  if (internal.resources.coin < cost.coin || internal.resources.food < cost.food || (iron > 0 && internal.resources.iron < iron)) {
     return { roster, internal, ok: false, reason: "no-resource", cost }
   }
 
@@ -53,6 +58,7 @@ export function recruitTroops(
         coin: internal.resources.coin - cost.coin,
         food: internal.resources.food - cost.food,
         pop: internal.resources.pop - cost.pop,
+        ...(iron > 0 ? { iron: internal.resources.iron - iron } : {}),
       },
     },
     ok: true,

@@ -4,6 +4,7 @@ import type { GeneralConfig, RosterState } from "../general/types.ts"
 import type { InternalConfig, InternalState } from "../internal/types.ts"
 import { EMPTY_SLOT, gainExp } from "../general/engine.ts"
 import { capOf } from "../internal/engine.ts"
+import { overridesIdle, winExpPerEnemyOf } from "../dev/devOverrides.ts"
 import type { DeployedSlot, SettleOutcome, SettleReport, StageFile } from "./types.ts"
 import type { Stage } from "./types.ts"
 
@@ -44,9 +45,8 @@ export function settleBattle(input: {
     enemyKilled += count - alive
   }
 
-  const expTotal = Math.floor(
-    outcome === "win" ? enemyDeployed * rules.winExpPerEnemy : enemyKilled * rules.loseExpPerEnemy,
-  )
+  const winPer = overridesIdle() ? rules.winExpPerEnemy : winExpPerEnemyOf(rules.winExpPerEnemy)
+  const expTotal = Math.floor(outcome === "win" ? enemyDeployed * winPer : enemyKilled * rules.loseExpPerEnemy)
   const lootCoin = outcome === "win" ? Math.floor(enemyDeployed * rules.winCoinPerEnemy) : 0
 
   const generalIds: string[] = []
