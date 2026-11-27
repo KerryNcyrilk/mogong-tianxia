@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { asset } from "../../lib/asset.ts"
 import { STYLE } from "./tokens.ts"
 import { V3_LAYOUT, type V3Zone } from "../../demo/cityV3.ts"
 import type { InternalState } from "../../internal/types.ts"
@@ -46,7 +47,7 @@ export function V3WorldLayer({ frame, internal, onAction, scale = 1, focusId = n
       }}
     >
       <img
-        src={art.src}
+        src={asset(art.src)}
         alt=""
         draggable={false}
         style={{ position: "absolute", left: 0, top: 0, width: "100%", height: "100%", pointerEvents: "none" }}
@@ -63,7 +64,7 @@ export function V3WorldLayer({ frame, internal, onAction, scale = 1, focusId = n
         </defs>
         {hovered ? (
           <image
-            href={art.src}
+            href={asset(art.src)}
             x={0}
             y={0}
             width={art.w}
