@@ -1,3 +1,4 @@
+import { asset } from "../lib/asset.ts"
 import type { UnitType } from "../combat/types.ts"
 
 /**
@@ -25,7 +26,7 @@ function slot(
   format: ArtFormat,
   label: string,
 ): ArtSlot {
-  return { key, src, width, height, format, status: "placeholder", label }
+  return { key, src: asset(src), width, height, format, status: "placeholder", label }
 }
 
 export const unitArt: Record<UnitType, ArtSlot> = {
