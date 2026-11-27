@@ -1,0 +1,111 @@
+{
+  "schema": "sim-report.v1",
+  "createdAt": "2026-11-27T01:30:14.080Z",
+  "config": {
+    "games": 10,
+    "scenario": "sandbox/default-12x8",
+    "engine": "combat/battle.auto"
+  },
+  "games": [
+    {
+      "index": 0,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    },
+    {
+      "index": 1,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    },
+    {
+      "index": 2,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    },
+    {
+      "index": 3,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    },
+    {
+      "index": 4,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    },
+    {
+      "index": 5,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    },
+    {
+      "index": 6,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    },
+    {
+      "index": 7,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    },
+    {
+      "index": 8,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    },
+    {
+      "index": 9,
+      "turns": 15,
+      "winner": "defender",
+      "moHp": 634,
+      "qinHp": 356,
+      "moLossRate": 49.52,
+      "qinLossRate": 64.47
+    }
+  ],
+  "winRate": {
+    "mo": 0,
+    "qin": 100,
+    "draw": 0
+  },
+  "avgTurns": 15,
+  "lossRate": {
+    "mo": 49.5,
+    "qin": 64.5
+  }
+}
