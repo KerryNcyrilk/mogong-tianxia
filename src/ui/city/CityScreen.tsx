@@ -453,7 +453,7 @@ export function CityScreen() {
               type="button"
               aria-label="收起內政"
               onClick={() => setLeftOpen(false)}
-              style={{ position: "absolute", inset: 0, zIndex: 28, background: "rgba(20, 14, 8, 0.55)", border: 0, padding: 0 }}
+              style={{ position: "absolute", inset: 0, zIndex: 28, background: "transparent", border: 0, padding: 0 }}
             />
           ) : null}
           {leftOpen ? (
@@ -467,7 +467,7 @@ export function CityScreen() {
                 height: 720 * drawerScale,
                 zIndex: 30,
                 overflow: "hidden",
-                boxShadow: `4px 0 18px rgba(0, 0, 0, 0.45)`,
+                boxShadow: `4px 0 10px ${STYLE.border}`,
               }}
             >
               <div style={{ position: "absolute", left: 0, top: 0, width: 276, height: 720, transform: `scale(${drawerScale})`, transformOrigin: "0 0" }}>
